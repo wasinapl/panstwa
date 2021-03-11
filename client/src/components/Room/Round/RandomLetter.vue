@@ -3,6 +3,7 @@
     <v-row>
       <v-col
         align="center"
+        justify="center"
         class="display-4"
         v-text="char"
         v-bind:style="{ 'font-weight': text }"

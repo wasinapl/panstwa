@@ -1,9 +1,9 @@
 module.exports = class Player{
-    constructor(socket){
+    constructor(socket, player, data){
         this.id = socket.id;
-        this.username = socket.username;
-        this.icon = socket.icon;
-        this.color = socket.color;
+        this.username = player.username;
+        this.icon = data.icons[player.icon - 1];
+        this.color = data.colors[player.color - 1];
         this.ready = false;
     }
 }

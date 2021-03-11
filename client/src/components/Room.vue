@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-row align="center" justify="center">
+    <!-- <v-row align="center" justify="center">
       <v-col cols="6">
         <v-card class="ma-3 pa-6" default tile :loading="loading">
           <NewPlayer v-if="newPlayer"></NewPlayer>
@@ -8,21 +8,21 @@
           <Round v-if="round" :playersG="playersG"></Round>
         </v-card>
       </v-col>
-    </v-row>
+    </v-row> -->
   </v-container>
 </template>
 
 <script>
-import NewPlayer from "./Room/NewPlayer";
-import Round from "./Room/Round";
-import WaitRoom from "./Room/WaitRoom";
+// import NewPlayer from "./Room/NewPlayer";
+// import Round from "./Room/Round";
+// import WaitRoom from "./Room/WaitRoom";
 
 export default {
-  components: {
-    NewPlayer,
-    Round,
-    WaitRoom
-  },
+  // components: {
+  //   NewPlayer,
+  //   Round,
+  //   WaitRoom
+  // },
   data: () => ({
     roomId: "",
     loading: false,

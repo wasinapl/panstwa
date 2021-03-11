@@ -5,11 +5,25 @@
         Liczba rund:
       </v-col>
       <v-col cols="5" align="start" justify="center">
-        <v-btn class="ma-2" text icon color="green" @click="roundChange('-')" :disabled="!admin">
+        <v-btn
+          class="ma-2"
+          text
+          icon
+          color="green"
+          @click="roundChange('-')"
+          :disabled="!admin"
+        >
           <v-icon large>mdi-minus-circle</v-icon>
         </v-btn>
         {{ options.rounds }}
-        <v-btn class="ma-2" text icon color="green" @click="roundChange('+')" :disabled="!admin">
+        <v-btn
+          class="ma-2"
+          text
+          icon
+          color="green"
+          @click="roundChange('+')"
+          :disabled="!admin"
+        >
           <v-icon large>mdi-plus-circle</v-icon>
         </v-btn>
       </v-col>
@@ -20,9 +34,39 @@
       </v-col>
     </v-row>
     <v-row>
+      <v-col cols="2" align="start" justify="center">
+        Liczba graczy:
+      </v-col>
+      <v-col cols="5" align="start" justify="center">
+        <v-btn
+          class="ma-2"
+          text
+          icon
+          color="green"
+          @click="playersChange('-')"
+          :disabled="!admin"
+        >
+          <v-icon large>mdi-minus-circle</v-icon>
+        </v-btn>
+        {{ options.players }}
+        <v-btn
+          class="ma-2"
+          text
+          icon
+          color="green"
+          @click="playersChange('+')"
+          :disabled="!admin"
+        >
+          <v-icon large>mdi-plus-circle</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
       <v-combobox
         v-model="options.categories"
         :items="items"
+        item-text="name"
+        item-value="id"
         :search-input.sync="search"
         hide-selected
         hint="Maksimum 5 kategorii"
@@ -52,32 +96,21 @@ export default {
   props: ["options", "admin"],
   data() {
     return {
-      items: [
-        "Państwa",
-        "Miasta",
-        "Rzeki",
-        "Imie",
-        "Imie męskie",
-        "Imie żeńskie",
-        "Roślina",
-        "Zwierze",
-        "Rzecz",
-        "Zawód",
-        "Samochód",
-      ],
-      //categories: options.categories,
+      items: [],
       search: null,
-      //roundCount: options.rounds,
       roomId: "",
     };
   },
   sockets: {
-      catChange(cat){
-          this.options.categories = cat;
-      },
-      rndChange(rnd){
-          this.options.rounds = rnd;
-      }
+    catChange(cat) {
+      this.options.categories = cat;
+    },
+    rndChange(rnd) {
+      this.options.rounds = rnd;
+    },
+    plyChange(ply) {
+      this.options.players = ply;
+    },
   },
   methods: {
     roundChange(val) {
@@ -86,15 +119,39 @@ export default {
         if (--this.options.rounds < 1) this.options.rounds = 1;
       }
     },
-    copyLink() {},
-  },
-  watch: {
-    categories(val) {
-      this.search = "";
-      if (val.length > 5) {
-        this.$nextTick(() => this.categories.pop());
+    playersChange(val) {
+      if (val === "+") {
+        if (++this.options.players > 6) this.options.players = 6;
+      }
+      else if (val === "-") {
+        if (--this.options.players < 2) this.options.players = 2;
       }
     },
+    copyLink() {},
+    async getCategories() {
+      try {
+        const response = await this.axios.get(this.$api + "/categories");
+        return response.data;
+      } catch (error) {
+        console.log("error", error);
+      }
+    },
+    async setUp() {
+      const categories = await this.getCategories();
+      this.items = categories;
+      this.isLoading = false;
+    },
+  },
+  watch: {
+    'options.categories'(val) {
+      this.search = "";
+      if (val.length > 5) {
+        this.$nextTick(() => this.options.categories.pop());
+      }
+    },
+  },
+  mounted() {
+    this.setUp();
   },
 };
 </script>
