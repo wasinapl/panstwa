@@ -109,6 +109,12 @@ module.exports = class Game {
     }
   }
 
+  vote(vote, socket){
+    const status = this.rounds[this.round].vote(vote, socket)
+    vote.status = status;
+    this.io.to(this.id).emit("vote", vote);
+  }
+
   getInfo() {
     const info = {};
     info.name = this.name;

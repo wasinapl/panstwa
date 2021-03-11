@@ -22,12 +22,7 @@
             {{ player.username }}
           </v-col>
           <v-col align="center" justify="center" cols="2">
-            <v-text-field
-              :value="player.word"
-              label="Solo"
-              solo
-              readonly
-            ></v-text-field>
+            <v-text-field :value="player.word" solo readonly></v-text-field>
           </v-col>
           <v-col align="center" justify="center" cols="2">
             <v-btn
@@ -40,8 +35,8 @@
             </v-btn>
           </v-col>
           <v-col align="center" justify="center" cols="6">
-              <v-icon v-for="i of player.v" :key="i">{{ status[0].icon }}</v-icon>
-              <v-icon v-for="i of player.x" :key="i">{{ status[1].icon }}</v-icon>
+            <v-icon v-for="i of player.v" :key="i">{{ status[0].icon }}</v-icon>
+            <v-icon v-for="i of player.x" :key="i">{{ status[1].icon }}</v-icon>
           </v-col>
         </v-row>
       </v-tab-item>
@@ -50,8 +45,10 @@
 </template>
 
 <script>
+import Vue from "vue";
+
 export default {
-    props:["words"],
+  props: ["words"],
   data() {
     return {
       tab: null,
@@ -68,16 +65,29 @@ export default {
       categories: [],
     };
   },
-  methods: {
-    change(cat, player) {
-      if (this.categories[cat].players[player].status == 1)
-        this.categories[cat].players[player].status = 0;
-      else this.categories[cat].players[player].status = 1;
+  sockets: {
+    vote({ cat, ply, status }) {
+      console.log({ cat, ply, status })
+      Vue.set(this.categories[cat].players[ply], "x", status.x);
+      Vue.set(this.categories[cat].players[ply], "v", status.v);
     },
   },
-  mounted(){
-      this.categories = this.words;
-  }
+  methods: {
+    change(cat, player) {
+      if (!this.categories[cat].players[player].empty) {
+        if (this.categories[cat].players[player].status == 1) {
+          Vue.set(this.categories[cat].players[player], "status", 0);
+          this.$socket.emit("vote", { cat, ply: player, status: 0 });
+        } else {
+          Vue.set(this.categories[cat].players[player], "status", 1);
+          this.$socket.emit("vote", { cat, ply: player, status: 1 });
+        }
+      }
+    },
+  },
+  mounted() {
+    this.categories = this.words;
+  },
 };
 </script>
 

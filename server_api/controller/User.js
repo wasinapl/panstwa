@@ -46,7 +46,7 @@ const User = {
 
       return res
         .status(200)
-        .send({ token, username: rows[0].username, email: rows[0].email });
+        .send({ token, username: rows[0].username, email: rows[0].email, uuid: rows[0].id  });
     } catch (error) {
       if (error.routine === "_bt_check_unique") {
         return res
@@ -78,7 +78,7 @@ const User = {
       const token = Helper.generateToken(rows[0].id);
       return res
         .status(200)
-        .send({ token, username: rows[0].username, email: rows[0].email });
+        .send({ token, username: rows[0].username, email: rows[0].email, uuid: rows[0].id });
     } catch (error) {
       return res.status(400).send(error);
     }
@@ -117,7 +117,7 @@ const User = {
 
           return res
             .status(200)
-            .send({ token, username: rows[0].username, email: rows[0].email });
+            .send({ token, username: rows[0].username, email: rows[0].email, uuid: rows[0].id  });
         } catch (error) {
           return res.status(400).send(error);
         }
@@ -125,7 +125,7 @@ const User = {
       const token = Helper.generateToken(rows[0].id);
       return res
         .status(200)
-        .send({ token, username: rows[0].username, email: rows[0].email });
+        .send({ token, username: rows[0].username, email: rows[0].email, uuid: rows[0].id  });
     } catch (error) {
       return res.status(400).send(error);
     }
@@ -151,6 +151,7 @@ const User = {
         req.user.id,
       ]);
       user.username = rows[0].username;
+      user.uuid = rows[0].id;
     } catch (error) {
       console.log(error);
       return res.status(400).send(error);

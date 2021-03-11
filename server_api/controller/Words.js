@@ -1,4 +1,5 @@
 import db from "../db";
+import latinize from "latinize";
 
 const Words = {
   async getVotes(req, res) {
@@ -18,14 +19,15 @@ const Words = {
 };
 
 async function getVotes(word, cat) {
+  const word_l = latinize(word.toLowerCase());
   const text = `SELECT vote_up, vote_down FROM words.words, words.categories
     WHERE cat_id = words.categories.id AND words.words.word = $1 AND words.categories.id = $2`;
-  const { rows } = await db.query(text, [word, cat]);
+  const { rows } = await db.query(text, [word_l, cat]);
   if (rows.length < 1) {
     const insert_query = `INSERT INTO words.words(
             word, cat_id, vote_up, vote_down)
             VALUES ($1, $2, 0, 0);`;
-    let { rows } = await db.query(insert_query, [word, cat]);
+    let { rows } = await db.query(insert_query, [word_l, cat]);
     return { vote_up: 0, vote_down: 0 };
   }
   return rows[0];

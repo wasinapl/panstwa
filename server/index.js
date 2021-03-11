@@ -65,6 +65,9 @@ io.on("connection", (socket) => {
   socket.on("words", words => {
     rooms[socket.room].addWords(words, socket);
   });
+  socket.on("vote", vote => {
+    rooms[socket.room].vote(vote, socket);
+  })
 
   socket.on("time", () => {
     io.to(socket.room).emit('time');
