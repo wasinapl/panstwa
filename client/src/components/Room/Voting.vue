@@ -41,6 +41,11 @@
         </v-row>
       </v-tab-item>
     </v-tabs-items>
+    <v-row>
+      <v-col align="center" justify="center" cols="12">
+        <v-btn color="success" :disabled="btn" @click="ready">gotowe</v-btn>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -52,6 +57,7 @@ export default {
   data() {
     return {
       tab: null,
+      btn: false,
       status: [
         {
           color: "success",
@@ -84,6 +90,10 @@ export default {
         }
       }
     },
+    ready(){
+      this.btn = true;
+      this.$socket.emit("voteReady");
+    }
   },
   mounted() {
     this.categories = this.words;

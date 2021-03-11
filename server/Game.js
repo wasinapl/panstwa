@@ -15,6 +15,7 @@ module.exports = class Game {
     this.options.players = 5;
     this.rounds = [];
     this.round = 0;
+    this.usedLetters = [];
     this.letters = [
       "A",
       "B",
@@ -85,11 +86,28 @@ module.exports = class Game {
   startGame() {
     this.round = 0;
     let letter = this.letters[Math.floor(this.letters.length * Math.random())];
+    this.usedLetters.push(letter);
     var round = new Round(letter, this.players, this.options.categories);
     this.rounds.push(round);
     this.io
       .to(this.id)
       .emit("startGame", {
+        round,
+        players: this.players,
+        categories: this.options.categories,
+      });
+  }
+  nextRound(){
+    this.round++;
+    let letter = this.letters[Math.floor(this.letters.length * Math.random())];
+    while (this.usedLetters.includes(letter)) {
+      letter = this.letters[Math.floor(this.letters.length * Math.random())];
+    }
+    var round = new Round(letter, this.players, this.options.categories);
+    this.rounds.push(round);
+    this.io
+      .to(this.id)
+      .emit("nextRound", {
         round,
         players: this.players,
         categories: this.options.categories,
@@ -113,6 +131,10 @@ module.exports = class Game {
     const status = this.rounds[this.round].vote(vote, socket)
     vote.status = status;
     this.io.to(this.id).emit("vote", vote);
+  }
+  voteReady(){
+    this.rounds[this.round].voteReady();
+    if(this.rounds[this.round].voteCount()) this.nextRound();
   }
 
   getInfo() {

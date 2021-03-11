@@ -4,6 +4,7 @@ module.exports = class Round {
     this.players = players;
     this.categories = categories;
     this.words = [];
+    this.voteReadyCount = 0;
     for (let category of this.categories) {
       let cat = {};
       cat.name = category.name;
@@ -58,6 +59,15 @@ module.exports = class Round {
       x: this.words[vote.cat].players[vote.ply].x,
       v: this.words[vote.cat].players[vote.ply].v,
     };
+  }
+
+  voteReady(){
+    this.voteReadyCount++;
+  }
+
+  voteCount(){
+    if(this.voteReadyCount == this.players.length) return true;
+    return false;
   }
 
   count() {

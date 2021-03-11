@@ -83,6 +83,13 @@ export default {
       this.round = data.round
       this.roundView = true;
     },
+    nextRound(data){
+      this.playersG = data.players;
+      this.categories = data.categories;
+      this.round = data.round;
+      this.voting = false;
+      this.roundView = true;
+    },
     voting(words){
       this.roundView = false;
       this.words = words;
