@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const shortid = require("shortid");
+require('dotenv').config()
 const Game = require("./Game");
 
 const server = app.listen(3000, function () {
@@ -19,7 +20,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("roomExist", name => {
-    if(rooms[name]) socket.emit('roomExist', true);
+    if(rooms[name] && rooms[name].isLobby()) socket.emit('roomExist', true);
     else socket.emit('roomExist', false);
   })
   socket.on("roomList", (callback) => {
@@ -33,6 +34,7 @@ io.on("connection", (socket) => {
   const emitRoomList = () =>{
     const list = [];
     for(key in rooms){
+      if(rooms[key].isLobby())
       list.push(rooms[key].getInfo());
     }
     io.emit('roomList', list)

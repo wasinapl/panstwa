@@ -29,6 +29,7 @@ app.get('/api/user/data', User.getData);
 app.get('/api/categories', Categories.getAll);
 
 app.post('/api/words/getvotes', Words.getVotes);
+app.post('/api/words/savevotes', Words.saveVotes);
 
 app.use(Auth.verifyToken);
 

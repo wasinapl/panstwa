@@ -7,15 +7,42 @@ const Words = {
     const categories = req.body.categories;
 
     for (let i = 0; i < words.length; i++) {
-      const element = words[i];
-      for (let j = 0; j < words[i].players.length; j++) {
-        const player = words[i].players[j];
-        let votes = await getVotes(player.word, categories[i].id);
-        player.votes = votes;
+      const category = words[i];
+      for (let j = 0; j < category.players.length; j++) {
+        const player = category.players[j];
+        if(!player.empty){
+          let votes = await getVotes(player.word, category.id);
+          player.votes = votes;
+        }
       }
     }
     return res.status(200).send(words);
   },
+
+  async saveVotes(req, res) {
+    const words = req.body.words;
+    const categories = req.body.categories;
+    const players = req.body.players.map((el) => getPlayerVote(el.uuid));
+  
+    for (let i = 0; i < words.length; i++) {
+      const category = words[i];
+      for (let j = 0; j < category.players.length; j++) {
+        const player = category.players[j];
+        for (let k = 0; k < player.v_list.length; k++) {
+          const element = player.v_list[k];
+          const rating = players.find((el) => el.id == element).rating;
+          await addVote(player.word, category.id, rating, true);
+        }
+  
+        for (let k = 0; k < player.x_list.length; k++) {
+          const element = player.x_list[k];
+          const rating = players.find((el) => el.id == element).rating;
+          await addVote(player.word, category.id, rating, false);
+        }
+      }
+    }
+    return res.status(200).send();
+  }
 };
 
 async function getVotes(word, cat) {
@@ -31,6 +58,30 @@ async function getVotes(word, cat) {
     return { vote_up: 0, vote_down: 0 };
   }
   return rows[0];
+}
+
+async function getPlayerVote(player) {
+  const query = `SELECT id_user, vote_up, vote_down FROM users.votes WHERE id_user= $1;`;
+  const { rows } = await db.query(query, [player]);
+  if (rows[0].vote_up + rows[0].vote_down < 10)
+    return { id: player, rating: 0.5 };
+  if (rows[0].vote_up == 0 && rows[0].vote_down != 0)
+    return { id: player, rating: 0.1 };
+  if (rows[0].vote_down == 0 && rows[0].vote_up != 0)
+    return { id: player, rating: 1 };
+  const rating =
+    Math.round(((rows[0].vote_up + rows[0].vote_down) / rows[0].vote_up) * 10) /
+    10;
+  return { id: player, rating };
+}
+
+async function addVote(word, category, rating, good) {
+  let query = "";
+  if (good)
+    query = `UPDATE words.words SET vote_up=vote_up + $3 WHERE word=$1 AND cat_id=$2;`;
+  else
+    query = `UPDATE words.words SET vote_down= vote_down + $3 WHERE word=$1 AND cat_id=$2;`;
+  const { rows } = await db.query(query, [word, category, rating]);
 }
 
 export default Words;

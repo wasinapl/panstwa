@@ -44,6 +44,15 @@ const User = {
         return res.status(400).send(error);
       }
 
+      try {
+        let query = `INSERT INTO users.votes(
+          id_user, vote_up, vote_down)
+          VALUES ($1, 0, 0)`;
+        await db.query(query, [rows[0].id]);
+      } catch (error) {
+        return res.status(400).send(error);
+      }
+
       return res
         .status(200)
         .send({ token, username: rows[0].username, email: rows[0].email, uuid: rows[0].id  });
@@ -89,7 +98,7 @@ const User = {
     try {
       const { rows } = await db.query(text, [req.body.email]);
       if (!rows[0]) {
-        const hashPassword = Helper.hashPassword(req.body.email);
+        const hashPassword = Helper.hashPassword('');
 
         const createQuery = `INSERT INTO
     users."user"(id, email,username, password)
@@ -111,6 +120,15 @@ const User = {
           VALUES ($1, 1, 1)`;
             let values = [rows[0].id];
             await db.query(query, values);
+          } catch (error) {
+            return res.status(400).send(error);
+          }
+
+          try {
+            let query = `INSERT INTO users.votes(
+              id_user, vote_up, vote_down)
+              VALUES ($1, 0, 0)`;
+            await db.query(query, [rows[0].id]);
           } catch (error) {
             return res.status(400).send(error);
           }

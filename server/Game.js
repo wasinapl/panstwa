@@ -15,6 +15,7 @@ module.exports = class Game {
     this.options.players = 5;
     this.rounds = [];
     this.round = 0;
+    this.lobby = true;
     this.usedLetters = [];
     this.letters = [
       "A",
@@ -85,6 +86,7 @@ module.exports = class Game {
   }
   startGame() {
     this.round = 0;
+    this.lobby = false;
     let letter = this.letters[Math.floor(this.letters.length * Math.random())];
     this.usedLetters.push(letter);
     var round = new Round(letter, this.players, this.options.categories);
@@ -117,7 +119,7 @@ module.exports = class Game {
     this.rounds[this.round].addWords(words, socket);
     if (this.rounds[this.round].count()) {
       const response = await Axios.post(
-        "http://localhost:3030/api/words/getvotes",
+        process.env.API + "/words/getvotes",
         {
           words: this.rounds[this.round].words,
           categories: this.rounds[this.round].categories,
@@ -134,6 +136,14 @@ module.exports = class Game {
   }
   voteReady(){
     this.rounds[this.round].voteReady();
+    Axios.post(
+      process.env.API + "/words/savevotes",
+      {
+        words: this.rounds[this.round].words,
+        categories: this.rounds[this.round].categories,
+        players: this.players,
+      }
+    );
     if(this.rounds[this.round].voteCount()) this.nextRound();
   }
 
@@ -145,13 +155,17 @@ module.exports = class Game {
     return info;
   }
 
+  isLobby(){
+    return this.lobby;
+  }
+
   getPlayers() {
     return this.players.length;
   }
 
   async getData() {
     try {
-      const response = await Axios.get("http://localhost:3030/api/user/data");
+      const response = await Axios.get(process.env.API + "/user/data");
       return response.data.data;
     } catch (error) {
       console.log("error", error);
