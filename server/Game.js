@@ -1,6 +1,7 @@
 const Player = require("./Player.js");
 const Round = require("./Round.js");
 const Axios = require("axios");
+var latinize = require("latinize");
 
 module.exports = class Game {
   constructor(io, socket, id, name) {
@@ -91,60 +92,96 @@ module.exports = class Game {
     this.usedLetters.push(letter);
     var round = new Round(letter, this.players, this.options.categories);
     this.rounds.push(round);
-    this.io
-      .to(this.id)
-      .emit("startGame", {
-        round,
-        players: this.players,
-        categories: this.options.categories,
-      });
+    this.io.to(this.id).emit("startGame", {
+      round,
+      players: this.players,
+      categories: this.options.categories,
+    });
   }
-  nextRound(){
+  nextRound() {
     this.round++;
+    if (this.round == this.options.rounds) {
+      this.endGame();
+      return;
+    }
     let letter = this.letters[Math.floor(this.letters.length * Math.random())];
     while (this.usedLetters.includes(letter)) {
       letter = this.letters[Math.floor(this.letters.length * Math.random())];
     }
     var round = new Round(letter, this.players, this.options.categories);
     this.rounds.push(round);
-    this.io
-      .to(this.id)
-      .emit("nextRound", {
-        round,
-        players: this.players,
-        categories: this.options.categories,
-      });
+    this.io.to(this.id).emit("nextRound", {
+      round,
+      players: this.players,
+      categories: this.options.categories,
+    });
   }
+
+  endGame() {
+    const tab = this.players;
+    tab.forEach((pl) => (pl.pkt = 0));
+
+    this.rounds.forEach((round) => {
+      round.words.forEach((category) => {
+        let bonus = 0;
+        for (let i = 0; i < category.players.length; i++) {
+          if (category.players[i].empty) {
+            bonus = 5;
+            break;
+          }
+        }
+        
+        category.players.forEach((player) => {
+          if (player.empty) {
+            player.pkt = 0;
+            return;
+          }
+          let word = latinize(player.word.toLowerCase());
+          for (let i = 0; i < category.players.length; i++) {
+            if(category.players[i].empty) continue;
+            if(category.players[i].name == player.name) continue;
+            let word2 = latinize(category.players[i].word.toLowerCase())
+            if (word2 == word) {
+              player.pkt = 5 + bonus;
+              tab.find(pl => pl.name == player.name).pkt += 5 + bonus;
+              return;
+            }
+          }
+          player.pkt = 10 + bonus;
+          tab.find(pl => pl.name == player.name).pkt += 10 + bonus;
+        });
+      });
+    });
+    this.io.to(this.id).emit("endGame", {
+      tab,
+      rounds: this.rounds,
+    });
+  }
+
   async addWords(words, socket) {
     this.rounds[this.round].addWords(words, socket);
     if (this.rounds[this.round].count()) {
-      const response = await Axios.post(
-        process.env.API + "/words/getvotes",
-        {
-          words: this.rounds[this.round].words,
-          categories: this.rounds[this.round].categories,
-        }
-      );
+      const response = await Axios.post(process.env.API + "/words/getvotes", {
+        words: this.rounds[this.round].words,
+        categories: this.rounds[this.round].categories,
+      });
       this.io.to(this.id).emit("voting", response.data);
     }
   }
 
-  vote(vote, socket){
-    const status = this.rounds[this.round].vote(vote, socket)
+  vote(vote, socket) {
+    const status = this.rounds[this.round].vote(vote, socket);
     vote.status = status;
     this.io.to(this.id).emit("vote", vote);
   }
-  voteReady(){
+  voteReady() {
     this.rounds[this.round].voteReady();
-    Axios.post(
-      process.env.API + "/words/savevotes",
-      {
-        words: this.rounds[this.round].words,
-        categories: this.rounds[this.round].categories,
-        players: this.players,
-      }
-    );
-    if(this.rounds[this.round].voteCount()) this.nextRound();
+    Axios.post(process.env.API + "/words/savevotes", {
+      words: this.rounds[this.round].words,
+      categories: this.rounds[this.round].categories,
+      players: this.players,
+    });
+    if (this.rounds[this.round].voteCount()) this.nextRound();
   }
 
   getInfo() {
@@ -155,7 +192,7 @@ module.exports = class Game {
     return info;
   }
 
-  isLobby(){
+  isLobby() {
     return this.lobby;
   }
 

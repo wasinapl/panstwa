@@ -18,6 +18,7 @@
                 :players="playersG"
               ></Round>
               <Voting v-if="voting" :words="words"></Voting>
+              <Results v-if="false"/>
             </v-col>
           </v-row>
         </v-card>
@@ -38,13 +39,15 @@ import Chat from "../../components/Chat";
 import WaitRoom from "../../components/Room/WaitRoom";
 import Round from "../../components/Room/Round";
 import Voting from "../../components/Room/Voting";
+import Results from "../../components/Room/Results";
 
 export default {
   components: {
     Chat,
     WaitRoom,
     Round,
-    Voting
+    Voting,
+    Results
   },
   data: () => ({
     roomId: "",
@@ -89,6 +92,9 @@ export default {
       this.round = data.round;
       this.voting = false;
       this.roundView = true;
+    },
+    endGame(data){
+      console.log(data)
     },
     voting(words){
       this.roundView = false;

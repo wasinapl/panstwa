@@ -8,10 +8,12 @@ const Words = {
 
     for (let i = 0; i < words.length; i++) {
       const category = words[i];
+      const cat_id = categories.find(cat => cat.name == category.name).id;
       for (let j = 0; j < category.players.length; j++) {
         const player = category.players[j];
         if(!player.empty){
-          let votes = await getVotes(player.word, category.id);
+          
+          let votes = await getVotes(player.word, cat_id);
           player.votes = votes;
         }
       }
@@ -22,22 +24,28 @@ const Words = {
   async saveVotes(req, res) {
     const words = req.body.words;
     const categories = req.body.categories;
-    const players = req.body.players.map((el) => getPlayerVote(el.uuid));
+    const players = [];
+    for (let i = 0; i < req.body.players.length; i++) {
+      const element = req.body.players[i];
+      const pl = await getPlayerVote(element.uuid);
+      players.push(pl);
+    }
   
     for (let i = 0; i < words.length; i++) {
       const category = words[i];
+      const cat_id = categories.find(cat => cat.name == category.name).id;
       for (let j = 0; j < category.players.length; j++) {
         const player = category.players[j];
         for (let k = 0; k < player.v_list.length; k++) {
           const element = player.v_list[k];
           const rating = players.find((el) => el.id == element).rating;
-          await addVote(player.word, category.id, rating, true);
+          await addVote(player.word, cat_id, rating * 10, true);
         }
   
         for (let k = 0; k < player.x_list.length; k++) {
           const element = player.x_list[k];
           const rating = players.find((el) => el.id == element).rating;
-          await addVote(player.word, category.id, rating, false);
+          await addVote(player.word, cat_id, rating * 10, false);
         }
       }
     }

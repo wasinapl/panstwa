@@ -33,6 +33,8 @@ module.exports = class Round {
         player.word = "";
         player.x = this.players.length;
         player.v = 0;
+        player.x_list = [];
+        player.v_list = [];
       }
       this.words[i].players.push(player);
     }
