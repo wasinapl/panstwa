@@ -65,11 +65,11 @@ async function getVotes(word, cat) {
     let { rows } = await db.query(insert_query, [word_l, cat]);
     return { vote_up: 0, vote_down: 0 };
   }
-  return rows[0];
+  return {vote_up: Number(rows[0].vote_up), vote_down: Number(rows[0].vote_down)};
 }
 
 async function getPlayerVote(player) {
-  const query = `SELECT id_user, vote_up, vote_down FROM users.votes WHERE id_user= $1;`;
+  const query = `SELECT user_id, vote_up, vote_down FROM users.votes_count WHERE user_id= $1;`;
   const { rows } = await db.query(query, [player]);
   if (rows[0].vote_up + rows[0].vote_down < 10)
     return { id: player, rating: 0.5 };

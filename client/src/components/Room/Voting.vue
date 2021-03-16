@@ -103,7 +103,7 @@ export default {
       this.$socket.emit("voteReady");
     },
     calc(pl) {
-      return Math.round(((pl.vote_up + pl.vote_down) / pl.vote_up) * 10) / 10;
+      return Math.round((pl.votes.vote_up / (pl.votes.vote_up + pl.votes.vote_down)) * 100);
     },
     check(pl){
       if(!pl.votes) return false;

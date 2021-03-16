@@ -19,28 +19,28 @@ module.exports = class Game {
     this.lobby = true;
     this.usedLetters = [];
     this.letters = [
-      "A",
-      "B",
+      // "A",
+      // "B",
       "C",
-      "D",
-      "E",
-      "F",
-      "G",
-      "H",
-      "I",
-      "J",
-      "K",
-      "L",
-      "M",
-      "N",
-      "O",
-      "P",
-      "R",
-      "S",
-      "T",
-      "U",
-      "W",
-      "Z",
+      // "D",
+      // "E",
+      // "F",
+      // "G",
+      // "H",
+      // "I",
+      // "J",
+      // "K",
+      // "L",
+      // "M",
+      // "N",
+      // "O",
+      // "P",
+      // "R",
+      // "S",
+      // "T",
+      // "U",
+      // "W",
+      // "Z",
     ];
     socket.join(id);
     socket.emit("joinRoom", id);
@@ -135,6 +135,11 @@ module.exports = class Game {
             player.pkt = 0;
             return;
           }
+          if(player.x > player.v){
+            player.pkt = 0;
+            return;
+          }
+
           let word = latinize(player.word.toLowerCase());
           for (let i = 0; i < category.players.length; i++) {
             if(category.players[i].empty) continue;
