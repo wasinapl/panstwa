@@ -26,6 +26,9 @@
       <v-col cols="3">
         <v-card class="ma-3 pa-6" outlined tile style="height: 90vh;">
           <v-row align="center" justify="center">
+            <PlayersList :players="players"/>
+          </v-row>
+          <v-row align="center" justify="center">
             <Chat :players="players" :playerId="playerId"></Chat>
           </v-row>
         </v-card>
@@ -40,6 +43,7 @@ import WaitRoom from "../../components/Room/WaitRoom";
 import Round from "../../components/Room/Round";
 import Voting from "../../components/Room/Voting";
 import Results from "../../components/Room/Results";
+import PlayersList from "../../components/Room/PlayersList";
 
 export default {
   components: {
@@ -47,7 +51,8 @@ export default {
     WaitRoom,
     Round,
     Voting,
-    Results
+    Results,
+    PlayersList
   },
   data: () => ({
     roomId: "",

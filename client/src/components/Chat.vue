@@ -2,7 +2,7 @@
   <div class="chat-box">
     <v-container
       class="fill-height"
-      style="overflow-y: scroll; height: 720px; max-height: 720px;"
+      style="overflow-y: scroll; height: 520px; max-height: 520px;"
       id="msgContainer"
     >
       <v-row class="fill-height pb-14" align="end">
