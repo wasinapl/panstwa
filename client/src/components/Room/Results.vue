@@ -7,22 +7,27 @@
             <th class="text-left">
               Nazwa
             </th>
+            <th class="text-left"></th>
             <th class="text-left">
               Punkty
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in desserts" :key="item.name">
+          <tr v-for="player in table" :key="player.uuid">
             <td>
-              <v-avatar size="25"
-                ><v-icon color="black">
-                  mdi-account-circle
+              <v-avatar size="25" :color="player.color"
+                ><v-icon>
+                  {{ player.icon }}
                 </v-icon></v-avatar
               >
-              {{ item.name }}
+              {{ player.username }}
             </td>
-            <td>{{ item.calories }}</td>
+            <td>
+              <v-icon color="green darken-2">mdi-thumb-up-outline</v-icon>
+              <v-icon color="red darken-2">mdi-thumb-down</v-icon>
+            </td>
+            <td>{{ player.pkt }}</td>
           </tr>
         </tbody>
       </template>
@@ -32,51 +37,16 @@
 
 <script>
 export default {
+  props: ["table", "rounds"],
   data() {
-    return {
-      desserts: [
-        {
-          name: "Frozen Yogurt",
-          calories: 159,
-        },
-        {
-          name: "Ice cream sandwich",
-          calories: 237,
-        },
-        {
-          name: "Eclair",
-          calories: 262,
-        },
-        {
-          name: "Cupcake",
-          calories: 305,
-        },
-        {
-          name: "Gingerbread",
-          calories: 356,
-        },
-        {
-          name: "Jelly bean",
-          calories: 375,
-        },
-        {
-          name: "Lollipop",
-          calories: 392,
-        },
-        {
-          name: "Honeycomb",
-          calories: 408,
-        },
-        {
-          name: "Donut",
-          calories: 452,
-        },
-        {
-          name: "KitKat",
-          calories: 518,
-        },
-      ],
-    };
+    return {};
+  },
+  mounted() {
+    this.table.sort((a, b) => {
+      if (a.pkt > b.pkt) return -1;
+      if (a.pkt < b.pkt) return 1;
+      return 0;
+    });
   },
 };
 </script>

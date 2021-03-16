@@ -34,7 +34,15 @@
               <v-icon>{{ status[player.status].icon }}</v-icon>
             </v-btn>
           </v-col>
-          <v-col align="center" justify="center" cols="6">
+          <v-col align="center" justify="center" cols="3" style="margin-top:10px">
+            <v-progress-linear :value="calc(player)" color="green" height="25" v-if="progress(player)">
+              <template v-slot:default="{ value }">
+                <strong>{{ Math.ceil(value) }}%</strong>
+              </template>
+            </v-progress-linear>
+            <p v-if="check(player)">Brak danych</p>
+          </v-col>
+          <v-col align="center" justify="center" cols="3">
             <v-icon v-for="i of player.v" :key="i">{{ status[0].icon }}</v-icon>
             <v-icon v-for="i of player.x" :key="i">{{ status[1].icon }}</v-icon>
           </v-col>
@@ -73,7 +81,7 @@ export default {
   },
   sockets: {
     vote({ cat, ply, status }) {
-      console.log({ cat, ply, status })
+      console.log({ cat, ply, status });
       Vue.set(this.categories[cat].players[ply], "x", status.x);
       Vue.set(this.categories[cat].players[ply], "v", status.v);
     },
@@ -90,9 +98,22 @@ export default {
         }
       }
     },
-    ready(){
+    ready() {
       this.btn = true;
       this.$socket.emit("voteReady");
+    },
+    calc(pl) {
+      return Math.round(((pl.vote_up + pl.vote_down) / pl.vote_up) * 10) / 10;
+    },
+    check(pl){
+      if(!pl.votes) return false;
+      if(pl.votes.vote_up + pl.votes.vote_down < 1) return true
+      return false
+    },
+    progress(pl){
+      if(!pl.votes) return false;
+      if(pl.votes.vote_up + pl.votes.vote_down < 1) return false;
+      return true;
     }
   },
   mounted() {

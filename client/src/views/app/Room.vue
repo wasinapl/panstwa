@@ -18,7 +18,7 @@
                 :players="playersG"
               ></Round>
               <Voting v-if="voting" :words="words"></Voting>
-              <Results v-if="false"/>
+              <Results v-if="resultsView" :rounds="rounds" :table="table"/>
             </v-col>
           </v-row>
         </v-card>
@@ -56,12 +56,15 @@ export default {
     waitRoom: false,
     roundView: false,
     voting: false,
+    resultsView:  false,
     options: {},
     players: [],
     playersG: [],
     categories: [],
     words: [],
     round: {},
+    rounds: [],
+    table: [],
     admin: false,
   }),
   sockets: {
@@ -93,7 +96,13 @@ export default {
       this.voting = false;
       this.roundView = true;
     },
-    endGame(data){
+    endGame({rounds, tab}){
+      this.rounds = rounds;
+      this.table = tab;
+      this.voting = false;
+      this.resultsView = true;
+    },
+    endGame2(data){
       console.log(data)
     },
     voting(words){

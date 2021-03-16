@@ -40,7 +40,6 @@ module.exports = class Game {
       "T",
       "U",
       "W",
-      "Y",
       "Z",
     ];
     socket.join(id);
@@ -139,21 +138,28 @@ module.exports = class Game {
           let word = latinize(player.word.toLowerCase());
           for (let i = 0; i < category.players.length; i++) {
             if(category.players[i].empty) continue;
-            if(category.players[i].name == player.name) continue;
+            if(category.players[i].uuid == player.uuid) continue;
             let word2 = latinize(category.players[i].word.toLowerCase())
             if (word2 == word) {
               player.pkt = 5 + bonus;
-              tab.find(pl => pl.name == player.name).pkt += 5 + bonus;
+              tab.find(pl => pl.uuid == player.uuid).pkt += 5 + bonus;
               return;
             }
           }
           player.pkt = 10 + bonus;
-          tab.find(pl => pl.name == player.name).pkt += 10 + bonus;
+          tab.find(pl => pl.uuid == player.uuid).pkt += 10 + bonus;
         });
       });
     });
     this.io.to(this.id).emit("endGame", {
       tab,
+      rounds: this.rounds,
+    });
+    this.io.to(this.id).emit("endGame2", {
+      admin: this.players.find(pl => pl.id == this.admin).uuid,
+      options: this.options,
+      name: this.name,
+      players: this.players,
       rounds: this.rounds,
     });
   }

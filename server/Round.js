@@ -20,6 +20,7 @@ module.exports = class Round {
       player.icon = info.icon;
       player.color = info.color;
       player.username = info.username;
+      player.uuid = info.uuid;
       if (words[i].length > 1) {
         player.word = words[i];
         player.status = 0;
