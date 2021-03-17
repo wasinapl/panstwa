@@ -17,39 +17,66 @@
           </div>
         </template>
 
-        <v-list>
+        <v-list v-if="playerId != player.id">
           <v-list-item
             v-for="(item, i) in items"
             :key="i"
-            @click="selectSection(item)"
+            @click="selectSection(item, player)"
           >
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
     </v-row>
+    <ReportDialog v-if="dialog" @ok="dialog = false" :message="message" />
   </v-container>
 </template>
 
 <script>
+import ReportDialog from "./ReportDialog";
+
 export default {
-  props: ["players"],
+  props: ["players", "admin", "playerId"],
+  components: { ReportDialog },
   data() {
     return {
-      items: [{ title: "Zgłoś" }, { title: "Wyrzuć" }],
+      items: [],
+      dialog: false,
+      message: "",
     };
   },
   methods: {
-    selectSection(item) {
+    selectSection(item, player) {
+      const headers = this.$header();
       switch (item.title) {
         case "Zgłoś":
-          console.log("Zgłoś");
+          console.log(item)
+          this.axios
+            .post(
+              this.$api + "/user/report",
+              {
+                to: player.uuid,
+              },
+              { headers }
+            )
+            .then((res) => {
+              this.message = res.data.message;
+              this.dialog = true;
+            })
+            .catch((err) => {
+              console.log(err.data.message);
+            });
+
           break;
         case "Wyrzuć":
           console.log("Wyrzuć");
           break;
       }
     },
+  },
+  mounted() {
+    if (this.admin) this.items = [{ title: "Zgłoś" }, { title: "Wyrzuć" }];
+    else this.items = [{ title: "Zgłoś" }];
   },
 };
 </script>

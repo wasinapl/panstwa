@@ -26,7 +26,7 @@
       <v-col cols="3">
         <v-card class="ma-3 pa-6" outlined tile style="height: 90vh;">
           <v-row align="center" justify="center">
-            <PlayersList :players="players" />
+            <PlayersList v-if="waitRoom" :players="players" :admin="admin" :playerId="playerId"/>
           </v-row>
           <v-row align="center" justify="center">
             <Chat :players="players" :playerId="playerId"></Chat>

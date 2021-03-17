@@ -60,7 +60,7 @@ export default {
         value: "pass",
         align: "start",
       },
-      { text: "Actions", value: "actions", sortable: false },
+      { text: "Akcje", value: "actions", sortable: false },
     ],
     search: "",
     desserts: [],

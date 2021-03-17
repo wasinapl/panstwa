@@ -227,6 +227,19 @@ const User = {
     }
     return res.status(200).send({ message: "Pomyślnie zmieniono dane" });
   },
+
+  async report(req, res){
+    const to = req.body.to;
+    console.log(req.body)
+    let query = `INSERT INTO users.reports("from", "to") VALUES ($1, $2)`;
+    try {
+      let { rows } = await db.query(query, [req.user.id, to]);
+      return res.status(200).send({ message: "Pomyślnie zgłoszono gracza" });
+    } catch (error) {
+        console.log(error)
+      return res.status(400).send(error);
+    }
+  }
 };
 
 export default User;
