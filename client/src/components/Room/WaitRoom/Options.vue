@@ -1,10 +1,10 @@
 <template>
   <v-container>
-    <v-row>
-      <v-col cols="2" align="start" justify="center">
+    <v-row style="height: 50px;">
+      <v-col cols="2" align="start" justify="center" style="margin-top: 10px;">
         Liczba rund:
       </v-col>
-      <v-col cols="5" align="start" justify="center">
+      <v-col cols="3" align="start" justify="center">
         <v-btn
           class="ma-2"
           text
@@ -27,14 +27,24 @@
           <v-icon large>mdi-plus-circle</v-icon>
         </v-btn>
       </v-col>
-      <v-col cols="5" align="start" justify="center" v-if="admin">
+      <v-col cols="3">
+        <v-text-field
+          v-model="link"
+          outlined
+          readonly
+          dense
+          style="margin: 8px"
+          id="link"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="4" align="start" justify="center" v-if="admin">
         <v-btn class="ma-2" color="green" @click="copyLink">
           Skopiuj link
         </v-btn>
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="2" align="start" justify="center">
+      <v-col cols="2" align="start" justify="center" style="margin-top: 10px;">
         Liczba graczy:
       </v-col>
       <v-col cols="5" align="start" justify="center">
@@ -99,6 +109,7 @@ export default {
       items: [],
       search: null,
       roomId: "",
+      link: "",
     };
   },
   sockets: {
@@ -122,12 +133,15 @@ export default {
     playersChange(val) {
       if (val === "+") {
         if (++this.options.players > 6) this.options.players = 6;
-      }
-      else if (val === "-") {
+      } else if (val === "-") {
         if (--this.options.players < 2) this.options.players = 2;
       }
     },
-    copyLink() {},
+    copyLink() {
+      let linkToCopy = document.querySelector("#link");
+      linkToCopy.select();
+      document.execCommand("copy");
+    },
     async getCategories() {
       try {
         const response = await this.axios.get(this.$api + "/categories");
@@ -140,10 +154,11 @@ export default {
       const categories = await this.getCategories();
       this.items = categories;
       this.isLoading = false;
+      this.link = "http://localhost:8080" + this.$route.fullPath;
     },
   },
   watch: {
-    'options.categories'(val) {
+    "options.categories"(val) {
       this.search = "";
       if (val.length > 5) {
         this.$nextTick(() => this.options.categories.pop());

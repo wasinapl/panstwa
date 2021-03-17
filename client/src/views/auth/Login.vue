@@ -198,7 +198,7 @@ export default {
 
       this.$store.dispatch("auth/loginG", usr).then(
         () => {
-          this.$router.push("/");
+          this.$router.push(this.$route.query.nextUrl);
         },
         (error) => {
           this.loginMsg = error.response.data.message;
