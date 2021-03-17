@@ -160,7 +160,7 @@ module.exports = class Game {
       tab,
       rounds: this.rounds,
     });
-    this.io.to(this.id).emit("endGame2", {
+    Axios.post(process.env.API + "/game/save", {
       admin: this.players.find(pl => pl.id == this.admin).uuid,
       options: this.options,
       name: this.name,
