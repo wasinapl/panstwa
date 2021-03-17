@@ -27,7 +27,7 @@
           <v-icon large>mdi-plus-circle</v-icon>
         </v-btn>
       </v-col>
-      <v-col cols="3">
+      <v-col cols="3" v-if="admin">
         <v-text-field
           v-model="link"
           outlined
@@ -43,7 +43,7 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row style="height: 50px;">
       <v-col cols="2" align="start" justify="center" style="margin-top: 10px;">
         Liczba graczy:
       </v-col>
@@ -69,6 +69,14 @@
         >
           <v-icon large>mdi-plus-circle</v-icon>
         </v-btn>
+      </v-col>
+    </v-row>
+    <v-row style="height: 50px;">
+      <v-col cols="2" align="start" justify="center" style="margin-top: 10px;">
+        Czas:
+      </v-col>
+      <v-col cols="2" align="start" justify="center">
+        <v-select :disabled="!admin" v-model="options.time" :items="times" solo dense></v-select>
       </v-col>
     </v-row>
     <v-row>
@@ -110,6 +118,7 @@ export default {
       search: null,
       roomId: "",
       link: "",
+      times: [],
     };
   },
   sockets: {
@@ -121,6 +130,9 @@ export default {
     },
     plyChange(ply) {
       this.options.players = ply;
+    },
+    timeChange(time) {
+      this.options.time = time;
     },
   },
   methods: {
@@ -155,6 +167,9 @@ export default {
       this.items = categories;
       this.isLoading = false;
       this.link = "http://localhost:8080" + this.$route.fullPath;
+      for (let i = 60; i > 20; i -= 5) {
+        this.times.push(i);
+      }
     },
   },
   watch: {

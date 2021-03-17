@@ -16,6 +16,7 @@
                 :round="round"
                 :categories="categories"
                 :players="playersG"
+                :time="options.time"
               ></Round>
               <Voting v-if="voting" :words="words"></Voting>
               <Results v-if="resultsView" :rounds="rounds" :table="table" />
@@ -168,6 +169,9 @@ export default {
     },
     "options.players": function(val) {
       if (this.admin) this.$socket.emit("plyChange", val);
+    },
+    "options.time": function(val) {
+      if (this.admin) this.$socket.emit("timeChange", val);
     },
   },
 };

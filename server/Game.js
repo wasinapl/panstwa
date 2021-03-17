@@ -14,6 +14,7 @@ module.exports = class Game {
     this.options = {};
     this.options.rounds = 5;
     this.options.categories = [];
+    this.options.time = 60;
     this.options.players = 5;
     this.rounds = [];
     this.round = 0;
@@ -79,6 +80,10 @@ module.exports = class Game {
   playersChange(socket, players) {
     this.options.players = players;
     socket.to(this.id).emit("plyChange", players);
+  }
+  timeChange(socket, time) {
+    this.options.time = time;
+    socket.to(this.id).emit("timeChange", time);
   }
   playerRdy(socket) {
     let index = this.players.findIndex((p) => p.id == socket.id);

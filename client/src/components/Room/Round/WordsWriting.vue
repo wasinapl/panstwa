@@ -66,13 +66,12 @@
 import Vue from "vue";
 
 export default {
-  props: ["playersG", "categoriesG", "letter"],
+  props: ["playersG", "categoriesG", "letter", "roundTime"],
   data() {
     return {
       randomLetter: false,
       test: "mdi-domain",
       test2: true,
-      roundTime: 60,
       progress: 0,
       time: 60,
       disabled: false,
@@ -106,9 +105,10 @@ export default {
     timer() {
       if (this.time > 0) {
         this.time--;
+        if (this.time < 10) this.disabledBtn = true;
         this.progress = 100 - Math.floor((this.time / this.roundTime) * 100);
         setTimeout(this.timer, 1000);
-      }else {
+      } else {
         this.disabled = true;
         this.disabledBtn = true;
         this.$socket.emit("words", this.words);
@@ -121,7 +121,7 @@ export default {
       for (let word of this.words) {
         if (word.length < 2) return;
       }
-      this.disabledBtn = false;
+      if (this.time > 10) this.disabledBtn = false;
     },
     done() {
       this.$socket.emit("time");
@@ -140,12 +140,14 @@ export default {
       this.players[0].color = "dark";
       this.players[0].color = color;
     },
-    time(){
+    time() {
       this.time = 10;
-    }
+      this.disabledBtn = true;
+    },
   },
   mounted() {
     this.userid = localStorage.getItem("socketid");
+    this.time = this.roundTime;
     const index = this.playersG.findIndex((el) => el.id == this.userid);
     this.players = this.playersG;
     this.categories = this.categoriesG;

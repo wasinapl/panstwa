@@ -57,6 +57,9 @@ io.on("connection", (socket) => {
     rooms[socket.room].playersChange(socket, players);
     emitRoomList();
   });
+  socket.on("timeChange", time => {
+    rooms[socket.room].timeChange(socket, time);
+  });
   socket.on("playerRdy", () => {
     rooms[socket.room].playerRdy(socket);
   });
