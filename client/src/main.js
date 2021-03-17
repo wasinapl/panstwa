@@ -12,11 +12,13 @@ import authHeader from './services/auth-header';
 
 Vue.use(VueRouter);
 
-const SocketInstance = socketio("http://localhost:3000");
+const SocketInstance = socketio('http://localhost:3000');
 
 SocketInstance.on("connect", () => {
   localStorage.setItem('socketid', SocketInstance.id)
 })
+
+
 
 Vue.use(
   new VueSocketIO({

@@ -2,38 +2,22 @@
   <v-dialog v-model="dialog" persistent max-width="600px">
     <v-card>
       <v-card-title>
-        <span class="headline">Nowy pokój</span>
+        <span class="headline">Hasło</span>
       </v-card-title>
       <v-card-text>
         <v-container>
           <v-row>
             <v-col cols="10">
               <v-text-field
-                label="Nazwa pokoju"
-                required
-                v-model="name"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="1">
-              <v-checkbox
-                v-model="ifPass"
-              ></v-checkbox>
-            </v-col>
-            <v-col cols="9">
-              <v-text-field
                 label="Hasło"
                 type="password"
-                :required="ifPass"
-                :disabled="!ifPass"
                 v-model="pass"
               ></v-text-field>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="3">
-              <v-btn color="success" class="p-4" @click="create">Stwórz</v-btn>
+              <v-btn color="success" class="p-4" @click="create">OK</v-btn>
             </v-col>
             <v-col cols="3">
               <v-btn color="primary" class="p-4" @click="close">Anuluj</v-btn>
@@ -47,11 +31,10 @@
 
 <script>
 export default {
+  props: ["password"],
   data: () => ({
     dialog: true,
-    name: "",
     pass: "",
-    ifPass: true,
   }),
   dialog(val) {
     if (!val) {
@@ -64,10 +47,7 @@ export default {
       this.dialog = false;
     },
     create() {
-      if(this.ifPass)
-      this.$socket.emit("newGame", {name: this.name, pass: this.pass});
-      else
-      this.$socket.emit("newGame", {name: this.name});
+      if (this.password == this.pass) this.$emit("ok");
     },
   },
 };

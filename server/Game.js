@@ -4,11 +4,12 @@ const Axios = require("axios");
 var latinize = require("latinize");
 
 module.exports = class Game {
-  constructor(io, socket, id, name) {
+  constructor(io, socket, id, data) {
     this.io = io;
     this.admin = socket.id;
     this.id = id;
-    this.name = name;
+    this.name = data.name;
+    if(data.pass) this.pass = data.pass;
     this.players = [];
     this.options = {};
     this.options.rounds = 5;
@@ -200,6 +201,7 @@ module.exports = class Game {
     info.name = this.name;
     info.slots = this.players.length + "/" + this.options.players;
     info.id = this.id;
+    info.pass = (this.pass) ? true : false;
     return info;
   }
 
@@ -209,6 +211,10 @@ module.exports = class Game {
 
   getPlayers() {
     return this.players.length;
+  }
+
+  adminCheck(id) {
+    return id == this.admin ? true : false;
   }
 
   async getData() {

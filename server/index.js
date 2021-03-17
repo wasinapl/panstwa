@@ -14,18 +14,20 @@ const rooms = [];
 io.on("connection", (socket) => {
   console.info(`Client connected [id=${socket.id}]`);
   // initialize this client's sequence number
-  socket.on("newGame", (name) => {
+  socket.on("newGame", (data) => {
     let roomId = shortid.generate();
-    rooms[roomId] = new Game(io, socket, roomId, name);
+    rooms[roomId] = new Game(io, socket, roomId, data);
   });
 
-  socket.on("roomExist", name => {
-    if(rooms[name] && rooms[name].isLobby()) socket.emit('roomExist', true);
-    else socket.emit('roomExist', false);
+  socket.on("roomExist", (name, res) => {
+    if(rooms[name] && rooms[name].isLobby())
+     res({exist: true, pass: rooms[name].pass, admin: rooms[name].adminCheck(socket.id)})
+    else res({exist: false});
   })
   socket.on("roomList", (callback) => {
     const list = [];
     for(key in rooms){
+      if(rooms[key].isLobby())
       list.push(rooms[key].getInfo());
     }
     callback(list);

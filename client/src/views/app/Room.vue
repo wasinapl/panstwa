@@ -18,7 +18,7 @@
                 :players="playersG"
               ></Round>
               <Voting v-if="voting" :words="words"></Voting>
-              <Results v-if="resultsView" :rounds="rounds" :table="table"/>
+              <Results v-if="resultsView" :rounds="rounds" :table="table" />
             </v-col>
           </v-row>
         </v-card>
@@ -26,7 +26,7 @@
       <v-col cols="3">
         <v-card class="ma-3 pa-6" outlined tile style="height: 90vh;">
           <v-row align="center" justify="center">
-            <PlayersList :players="players"/>
+            <PlayersList :players="players" />
           </v-row>
           <v-row align="center" justify="center">
             <Chat :players="players" :playerId="playerId"></Chat>
@@ -34,6 +34,12 @@
         </v-card>
       </v-col>
     </v-row>
+    <PasswordDialog
+      v-if="dialog"
+      @closed="back()"
+      :password="pass"
+      @ok="join()"
+    />
   </v-container>
 </template>
 
@@ -44,6 +50,7 @@ import Round from "../../components/Room/Round";
 import Voting from "../../components/Room/Voting";
 import Results from "../../components/Room/Results";
 import PlayersList from "../../components/Room/PlayersList";
+import PasswordDialog from "../../components/Room/PasswordDialog";
 
 export default {
   components: {
@@ -52,16 +59,19 @@ export default {
     Round,
     Voting,
     Results,
-    PlayersList
+    PlayersList,
+    PasswordDialog,
   },
   data: () => ({
     roomId: "",
-    playerId: '',
+    playerId: "",
     loading: false,
     waitRoom: false,
     roundView: false,
     voting: false,
-    resultsView:  false,
+    resultsView: false,
+    dialog: false,
+    pass: "",
     options: {},
     players: [],
     playersG: [],
@@ -73,13 +83,6 @@ export default {
     admin: false,
   }),
   sockets: {
-    async roomExist(res) {
-      if (!res) this.$router.push({ path: "/" });
-      else {
-        const player = await this.getUserInfo();
-        this.$socket.emit("playerJoin", { id: this.roomId, player });
-      }
-    },
     waitRoom({ options, players, admin, playerId }) {
       this.options = options;
       this.players = players;
@@ -91,37 +94,59 @@ export default {
       this.waitRoom = false;
       this.playersG = data.players;
       this.categories = data.categories;
-      this.round = data.round
+      this.round = data.round;
       this.roundView = true;
     },
-    nextRound(data){
+    nextRound(data) {
       this.playersG = data.players;
       this.categories = data.categories;
       this.round = data.round;
       this.voting = false;
       this.roundView = true;
     },
-    endGame({rounds, tab}){
+    endGame({ rounds, tab }) {
       this.rounds = rounds;
       this.table = tab;
       this.voting = false;
       this.resultsView = true;
     },
-    endGame2(data){
-      console.log(data)
+    endGame2(data) {
+      console.log(data);
     },
-    voting(words){
+    voting(words) {
       this.roundView = false;
       this.words = words;
       this.voting = true;
-    }
+    },
   },
   mounted() {
-    this.loading = true;
-    this.roomId = this.$route.query.id;
-    this.$socket.emit("roomExist", this.roomId);
+    this.checkRoom();
   },
   methods: {
+    async checkRoom() {
+      this.loading = true;
+      this.roomId = this.$route.query.id;
+      this.$socket.emit("roomExist", this.roomId, async (res) => {
+        if (!res.exist) this.back();
+        else {
+          if (res.pass) {
+            this.pass = res.pass;
+            if (res.admin) this.join();
+            else this.dialog = true;
+          } else {
+            this.join();
+          }
+        }
+      });
+    },
+    async join() {
+      this.dialog = false;
+      const player = await this.getUserInfo();
+      this.$socket.emit("playerJoin", { id: this.roomId, player });
+    },
+    back() {
+      this.$router.push({ path: "/" });
+    },
     async getUserInfo() {
       try {
         const headers = this.$header();

@@ -27,6 +27,9 @@
         <NewRoomDialog v-if="dialog" @closed="dialog = false"></NewRoomDialog>
       </v-toolbar>
     </template>
+    <template v-slot:item.pass="{ item }">
+      <v-icon v-if="item.pass">mdi-lock</v-icon>
+    </template>
     <template v-slot:item.actions="{ item }">
       <v-btn color="success" @click="join(item.id)" small>Dołącz</v-btn>
     </template>
@@ -50,6 +53,11 @@ export default {
       {
         text: "Miejsca",
         value: "slots",
+        align: "start",
+      },
+      {
+        text: "Hasło",
+        value: "pass",
         align: "start",
       },
       { text: "Actions", value: "actions", sortable: false },

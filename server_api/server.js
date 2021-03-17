@@ -1,8 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import path from 'path';
 import cors from 'cors';
-import db from './db';
 require('dotenv').config()
 
 import User from './controller/User';
