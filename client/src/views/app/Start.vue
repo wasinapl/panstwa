@@ -64,6 +64,9 @@ export default {
       }
     },
   },
+  mounted(){
+    this.$socket.emit('home')
+  }
 };
 </script>
 

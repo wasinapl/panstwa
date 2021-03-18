@@ -45,6 +45,12 @@ export default {
       message: "",
     };
   },
+  sockets: {
+    kick(id){
+      if(id == this.playerId)
+      this.$router.push('/');
+    }
+  },
   methods: {
     selectSection(item, player) {
       const headers = this.$header();
@@ -69,7 +75,7 @@ export default {
 
           break;
         case "Wyrzuć":
-          console.log("Wyrzuć");
+          this.$socket.emit("kick", player.id);
           break;
       }
     },

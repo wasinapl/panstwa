@@ -86,13 +86,25 @@ io.on("connection", (socket) => {
   socket.on("msg", (msg) => {
     socket.to(socket.room).emit('msg', {msg, from: socket.id});
   });
+
+  socket.on("kick", id => {
+    socket.to(socket.room).emit('kick', id);
+  });
+
+  socket.on("home", () => {
+    removeFromRoom(socket);
+  });
   
   socket.on("disconnect", () => {
     console.info(`Client gone [id=${socket.id}]`);
+    removeFromRoom(socket)
+  });
+
+  const removeFromRoom = (socket) => {
     if(rooms[socket.room]) {
       rooms[socket.room].playerLeft(socket.id)
       if(rooms[socket.room].getPlayers() == 0) delete rooms[socket.room];
       emitRoomList();
     };
-  });
+  }
 });
