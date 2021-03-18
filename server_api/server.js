@@ -37,6 +37,7 @@ app.use(Auth.verifyToken);
 app.get('/api/user/info', User.getInfo);
 app.post('/api/user/info', User.setInfo);
 app.post('/api/user/report', User.report);
+app.post('/api/user/password', User.password);
 
 app.listen(3030);
 

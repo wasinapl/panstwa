@@ -53,9 +53,12 @@ const User = {
         return res.status(400).send(error);
       }
 
-      return res
-        .status(200)
-        .send({ token, username: rows[0].username, email: rows[0].email, uuid: rows[0].id  });
+      return res.status(200).send({
+        token,
+        username: rows[0].username,
+        email: rows[0].email,
+        uuid: rows[0].id,
+      });
     } catch (error) {
       if (error.routine === "_bt_check_unique") {
         return res
@@ -85,9 +88,12 @@ const User = {
         return res.status(400).send({ message: "Podano złe hasło" });
       }
       const token = Helper.generateToken(rows[0].id);
-      return res
-        .status(200)
-        .send({ token, username: rows[0].username, email: rows[0].email, uuid: rows[0].id });
+      return res.status(200).send({
+        token,
+        username: rows[0].username,
+        email: rows[0].email,
+        uuid: rows[0].id,
+      });
     } catch (error) {
       return res.status(400).send(error);
     }
@@ -98,18 +104,13 @@ const User = {
     try {
       const { rows } = await db.query(text, [req.body.email]);
       if (!rows[0]) {
-        const hashPassword = Helper.hashPassword('');
+        const hashPassword = Helper.hashPassword("");
 
         const createQuery = `INSERT INTO
     users."user"(id, email,username, password)
       VALUES($1, $2, $3, $4)
       returning *`;
-        const values = [
-          uuidv4(),
-          req.body.email,
-          req.body.name,
-          hashPassword,
-        ];
+        const values = [uuidv4(), req.body.email, req.body.name, hashPassword];
         try {
           let { rows } = await db.query(createQuery, values);
           const token = Helper.generateToken(rows[0].id);
@@ -133,17 +134,23 @@ const User = {
             return res.status(400).send(error);
           }
 
-          return res
-            .status(200)
-            .send({ token, username: rows[0].username, email: rows[0].email, uuid: rows[0].id  });
+          return res.status(200).send({
+            token,
+            username: rows[0].username,
+            email: rows[0].email,
+            uuid: rows[0].id,
+          });
         } catch (error) {
           return res.status(400).send(error);
         }
       }
       const token = Helper.generateToken(rows[0].id);
-      return res
-        .status(200)
-        .send({ token, username: rows[0].username, email: rows[0].email, uuid: rows[0].id  });
+      return res.status(200).send({
+        token,
+        username: rows[0].username,
+        email: rows[0].email,
+        uuid: rows[0].id,
+      });
     } catch (error) {
       return res.status(400).send(error);
     }
@@ -228,18 +235,50 @@ const User = {
     return res.status(200).send({ message: "Pomyślnie zmieniono dane" });
   },
 
-  async report(req, res){
+  async password(req, res) {
+    const lastPass = req.body.lastPass;
+    const newPass = Helper.hashPassword(req.body.newPass);
+    if (await passCheck(req.user.id, lastPass)) {
+      try {
+        const response = await db.query(
+          `UPDATE users."user" SET password=$2 WHERE id=$1`,
+          [req.user.id, newPass]
+        );
+        return res.status(200).send({ message: "Pomyślnie zmieniono hasło" });
+      } catch (error) {
+        console.log(error);
+        return res.status(400).send(error);
+      }
+    } else {
+      return res.status(400).send({ message: "Podano złe stare hasło" });
+    }
+  },
+
+  async report(req, res) {
     const to = req.body.to;
-    console.log(req.body)
+
     let query = `INSERT INTO users.reports("from", "to") VALUES ($1, $2)`;
     try {
       let { rows } = await db.query(query, [req.user.id, to]);
       return res.status(200).send({ message: "Pomyślnie zgłoszono gracza" });
     } catch (error) {
-        console.log(error)
+      console.log(error);
       return res.status(400).send(error);
     }
-  }
+  },
 };
+
+async function passCheck(id, pass) {
+  const query = 'SELECT * FROM "users"."user" WHERE id = $1';
+  try {
+    const { rows } = await db.query(query, [id]);
+    if (!Helper.comparePassword(rows[0].password, pass)) {
+      return false;
+    }
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
 
 export default User;

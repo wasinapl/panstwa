@@ -27,7 +27,7 @@
       <v-col cols="3">
         <v-card class="ma-3 pa-6" outlined tile style="height: 90vh;">
           <v-row align="center" justify="center">
-            <PlayersList v-if="waitRoom" :players="players" :admin="admin" :playerId="playerId"/>
+            <PlayersList v-if="playersView" :players="players" :admin="admin" :playerId="playerId"/>
           </v-row>
           <v-row align="center" justify="center">
             <Chat :players="players" :playerId="playerId"></Chat>
@@ -71,6 +71,7 @@ export default {
     roundView: false,
     voting: false,
     resultsView: false,
+    playersView: false,
     dialog: false,
     pass: "",
     options: {},
@@ -89,6 +90,7 @@ export default {
       this.players = players;
       this.playerId = playerId;
       this.waitRoom = true;
+      this.playersView = true;
       this.admin = admin;
     },
     startGame(data) {
