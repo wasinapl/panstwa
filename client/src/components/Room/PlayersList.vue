@@ -56,7 +56,6 @@ export default {
       const headers = this.$header();
       switch (item.title) {
         case "Zgłoś":
-          console.log(item)
           this.axios
             .post(
               this.$api + "/user/report",

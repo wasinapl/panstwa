@@ -30,7 +30,7 @@
             <v-list-item
               v-for="(child, i) in item.children"
               :key="i"
-              :to="child.link"
+              :to="{ name: child.link}"
               link
             >
               <v-list-item-action v-if="child.icon">
@@ -102,7 +102,7 @@ export default {
     dialog: false,
     drawer: null,
     items: [
-      { text: "Użytkownicy", icon: "mdi-account-multiple", link: "users" },
+      { text: "Użytkownicy", icon: "mdi-account-multiple", link: { name:"users"} },
       { text: "Zgłoszenia", icon: "mdi-alert", link: "stages" },
       { text: "Kategorie", icon: "mdi-timeline", link: "lines" },
     ],

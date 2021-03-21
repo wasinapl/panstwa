@@ -1,6 +1,6 @@
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 import db from "../db";
 import Helper from "./Helper";
 
@@ -185,17 +185,19 @@ const User = {
     }
   },
 
-  async auth(req, res){
-    const token = req.headers['x-access-token'];
-    if(!token) {
-      return res.status(400).send({ 'message': 'Token is not provided' });
+  async auth(req, res) {
+    const token = req.headers["x-access-token"];
+    if (!token) {
+      return res.status(400).send({ message: "Token is not provided" });
     }
     try {
       const decoded = await jwt.verify(token, process.env.SECRET);
-      const text = 'SELECT * FROM users.user WHERE id = $1';
+      const text = "SELECT * FROM users.user WHERE id = $1";
       const { rows } = await db.query(text, [decoded.userId]);
-      if(!rows[0]) {
-        return res.status(400).send({ 'message': 'The token you provided is invalid' });
+      if (!rows[0]) {
+        return res
+          .status(400)
+          .send({ message: "The token you provided is invalid" });
       }
       let user = {
         token,
@@ -207,7 +209,7 @@ const User = {
         user,
         role: rows[0].role,
       });
-    } catch(error) {
+    } catch (error) {
       return res.status(400).send(error);
     }
   },
@@ -307,6 +309,80 @@ const User = {
     } catch (error) {
       console.log(error);
       return res.status(400).send(error);
+    }
+  },
+  async rate(req, res) {
+    const to = req.body.to;
+    const value = req.body.value;
+
+    let query = `SELECT id, "from", "to", value
+    FROM users.votes
+    WHERE "from" = $1 AND "to" = $2;`;
+    let rows = [];
+    try {
+      let response = await db.query(query, [req.user.id, to]);
+      rows = response.rows;
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send(error);
+    }
+
+    if (rows.length < 1) {
+      query = `INSERT INTO users.votes("from", "to", value)
+        VALUES ($1, $2, $3);`;
+      try {
+        await db.query(query, [req.user.id, to, value]);
+      } catch (error) {
+        console.log(error);
+        return res.status(400).send(error);
+      }
+
+      if (value) {
+        query = `UPDATE users.votes_count
+        SET vote_up=vote_up+1
+        WHERE user_id=$1;`;
+      } else {
+        query = `UPDATE users.votes_count
+        SET vote_down=vote_down+1
+        WHERE user_id=$1;`;
+      }
+
+      try {
+        await db.query(query, [to]);
+      } catch (error) {
+        console.log(error);
+        return res.status(400).send(error);
+      }
+      return res.status(200).send();
+    } else {
+      if (rows[0].value == value) return res.status(200).send();
+      if (rows[0].value) {
+        query = `UPDATE users.votes_count
+        SET vote_up=vote_up-1, vote_down=vote_down+1
+        WHERE user_id=$1;`;
+      } else {
+        query = `UPDATE users.votes_count
+        SET vote_up=vote_up+1, vote_down=vote_down-1
+        WHERE user_id=$1;`;
+      }
+      try {
+        await db.query(query, [to]);
+      } catch (error) {
+        console.log(error);
+        return res.status(400).send(error);
+      }
+
+      query = `UPDATE users.votes
+      SET value=$3
+      WHERE "from"=$1 AND "to"=$2;`;
+      try {
+        await db.query(query, [req.user.id, to, value]);
+      } catch (error) {
+        console.log(error);
+        return res.status(400).send(error);
+      }
+
+      return res.status(200).send();
     }
   },
 };

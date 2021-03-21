@@ -39,13 +39,13 @@ const Words = {
         for (let k = 0; k < player.v_list.length; k++) {
           const element = player.v_list[k];
           const rating = players.find((el) => el.id == element).rating;
-          await addVote(player.word, cat_id, rating * 10, true);
+          await addVote(player.word, cat_id, rating * 10, true, element);
         }
   
         for (let k = 0; k < player.x_list.length; k++) {
           const element = player.x_list[k];
           const rating = players.find((el) => el.id == element).rating;
-          await addVote(player.word, cat_id, rating * 10, false);
+          await addVote(player.word, cat_id, rating * 10, false, element);
         }
       }
     }
@@ -83,13 +83,25 @@ async function getPlayerVote(player) {
   return { id: player, rating };
 }
 
-async function addVote(word, category, rating, good) {
+async function addVote(word, category, rating, good, user_id) {
+  const word_l = latinize(word.toLowerCase());
   let query = "";
   if (good)
-    query = `UPDATE words.words SET vote_up=vote_up + $3 WHERE word=$1 AND cat_id=$2;`;
+    query = `UPDATE words.words SET vote_up=vote_up + $3 WHERE word=$1 AND cat_id=$2 returning *;`;
   else
-    query = `UPDATE words.words SET vote_down= vote_down + $3 WHERE word=$1 AND cat_id=$2;`;
-  const { rows } = await db.query(query, [word, category, rating]);
+    query = `UPDATE words.words SET vote_down= vote_down + $3 WHERE word=$1 AND cat_id=$2 returning *;`;
+  const { rows } = await db.query(query, [word_l, category, rating]);
+  if (good)
+  query = `INSERT INTO words.votes(
+    user_id, word_id, good, rate)
+    VALUES ($1, $2, true, $3);`
+  else
+  query = `INSERT INTO words.votes(
+    user_id, word_id, good, rate)
+    VALUES ($1, $2, false, $3);`
+  
+  await db.query(query, [user_id, rows[0].id, rating]);
 }
+
 
 export default Words;

@@ -9,11 +9,24 @@ const routes = [
   { path: "/room", component: Room },
   { path: "/login", component: Login },
   {
+    name: "admin",
     path: "/admin",
     component: Admin,
     meta: {
       adminAuth: true,
     },
+    children: [
+      {
+        name: "users",
+        path: "users",
+        component: () => import("./components/Admin/Users"),
+      },
+      {
+        name: "user",
+        path: "user/:id",
+        component: () => import("./components/Admin/User"),
+      },
+    ],
   },
 ];
 
@@ -26,7 +39,7 @@ router.beforeEach((to, from, next) => {
   const publicPages = ["/login", "/register"];
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem("user");
-  const role = JSON.parse(localStorage.getItem('role'))
+  const role = JSON.parse(localStorage.getItem("role"));
 
   if (authRequired && !loggedIn) {
     next({

@@ -44,7 +44,7 @@ const Game = {
             latinize(word.word.toLowerCase()),
             cat_id
           );
-          await addWord(word_id, round_id, word.pkt, cat_id);
+          await addWord(word_id, round_id, word.pkt, cat_id, word.uuid);
         }
       }
     }
@@ -80,14 +80,15 @@ async function addRound(game_id, letter) {
   }
 }
 
-async function addWord(word_id, round_id, points, category_id) {
-  let query = `INSERT INTO game.words(word_id, round_id, points, category_id) VALUES ($1, $2, $3, $4)`;
+async function addWord(word_id, round_id, points, category_id, uuid) {
+  let query = `INSERT INTO game.words(word_id, round_id, points, category_id, player_id) VALUES ($1, $2, $3, $4, $5)`;
   try {
     let { rows } = await db.query(query, [
       word_id,
       round_id,
       points,
       category_id,
+      uuid
     ]);
   } catch (error) {
     console.log(error);

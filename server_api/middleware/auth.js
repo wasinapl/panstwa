@@ -26,6 +26,13 @@ const Auth = {
     } catch(error) {
       return res.status(400).send(error);
     }
+  },
+
+  async adminAuth(req, res, next){
+    if(req.user.role != 2)
+    return res.status(400).send({ 'message': 'You dont have permision' });
+    else
+    next();
   }
 }
 
