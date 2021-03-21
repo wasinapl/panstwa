@@ -1,18 +1,14 @@
 <template>
   <v-card flat>
-    <v-row>
+    <v-row style="margin-left: 10px;">
       <v-col cols="3">
         <v-card color="#385F73" dark v-if="!loading">
           <v-card-title class="headline">
             Liczba gier:
           </v-card-title>
-          <v-card-subtitle><h1>20</h1></v-card-subtitle>
+          <v-card-subtitle><h1>{{ data.games }}</h1></v-card-subtitle>
         </v-card>
-        <v-skeleton-loader
-          v-if="loading"
-          v-bind="attrs"
-          type="article"
-        ></v-skeleton-loader>
+        <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
       </v-col>
       <v-col cols="4">
         <v-card color="#1F7087" dark v-if="!loading">
@@ -21,24 +17,16 @@
           </v-card-title>
           <v-card-subtitle><h1>125</h1></v-card-subtitle>
         </v-card>
-        <v-skeleton-loader
-          v-if="loading"
-          v-bind="attrs"
-          type="article"
-        ></v-skeleton-loader>
+        <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
       </v-col>
       <v-col cols="4">
         <v-card color="#952175" dark v-if="!loading">
           <v-card-title class="headline">
             Średnia ilość pkt na runde:
           </v-card-title>
-          <v-card-subtitle><h1>55</h1></v-card-subtitle>
+          <v-card-subtitle><h1>{{ data.average }}</h1></v-card-subtitle>
         </v-card>
-        <v-skeleton-loader
-          v-if="loading"
-          v-bind="attrs"
-          type="article"
-        ></v-skeleton-loader>
+        <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
       </v-col>
       <v-col cols="4">
         <v-card color="#067328" dark v-if="!loading">
@@ -47,11 +35,7 @@
           </v-card-title>
           <v-card-subtitle><h1>Imie damskie</h1></v-card-subtitle>
         </v-card>
-        <v-skeleton-loader
-          v-if="loading"
-          v-bind="attrs"
-          type="article"
-        ></v-skeleton-loader>
+        <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
       </v-col>
       <v-col cols="4">
         <v-card color="#067346" dark v-if="!loading">
@@ -60,11 +44,7 @@
           </v-card-title>
           <v-card-subtitle><h1>K</h1></v-card-subtitle>
         </v-card>
-        <v-skeleton-loader
-          v-if="loading"
-          v-bind="attrs"
-          type="article"
-        ></v-skeleton-loader>
+        <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
       </v-col>
     </v-row>
   </v-card>
@@ -74,10 +54,25 @@
 export default {
   data() {
     return {
-        loading: true,
+      loading: true,
+      data: {}
     };
   },
-  methods: {},
+  async mounted() {
+    const headers = this.$header();
+    this.axios
+      .get(
+        this.$api + "/user/statistics",
+        { headers }
+      )
+      .then((response) => {
+        this.data = response.data;
+        this.loading = false;
+      })
+      .catch((error) => {
+        console.log("error", error);
+      });
+  },
 };
 </script>
 

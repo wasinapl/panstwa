@@ -26,6 +26,11 @@ const routes = [
         path: "user/:id",
         component: () => import("./components/Admin/User"),
       },
+      {
+        name: "reports",
+        path: "reports",
+        component: () => import("./components/Admin/Reports"),
+      },
     ],
   },
 ];

@@ -7,6 +7,7 @@ import User from './controller/User';
 import Categories from './controller/Categories';
 import Words from './controller/Words';
 import Game from './controller/Game';
+import Statistics from './controller/Statistics';
 import Admin from './controller/Admin';
 import Auth from './middleware/auth';
 
@@ -39,6 +40,7 @@ app.use(Auth.verifyToken);
 
 app.get('/api/user/info', User.getInfo);
 app.post('/api/user/info', User.setInfo);
+app.get('/api/user/statistics', Statistics.getStatistics);
 app.post('/api/user/report', User.report);
 app.post('/api/user/password', User.password);
 app.post('/api/user/rate', User.rate);
@@ -47,6 +49,7 @@ app.use(Auth.adminAuth);
 
 app.post('/api/admin/searchuser', Admin.search)
 app.post('/api/admin/userinfo', Admin.getInfo)
+app.get('/api/admin/getreports', Admin.getReports)
 
 app.listen(3030);
 

@@ -26,7 +26,6 @@ const Admin = {
       const { rows } = await db.query(query, [id]);
       user = rows[0];
     } catch (error) {
-        console.log(1)
         console.log(error.message)
       return res.status(400).send(error);
     }
@@ -40,7 +39,6 @@ const Admin = {
       const { rows } = await db.query(query, [id]);
       games = rows;
     } catch (error) {
-        console.log(2)
         console.log(error.message)
       return res.status(400).send(error);
     }
@@ -55,7 +53,6 @@ const Admin = {
       const { rows } = await db.query(query, [id]);
       words = rows;
     } catch (error) {
-        console.log(3)
         console.log(error.message)
       return res.status(400).send(error);
     }
@@ -69,12 +66,43 @@ const Admin = {
       const { rows } = await db.query(query, [id]);
       votes = rows;
     } catch (error) {
-        console.log(4)
         console.log(error.message)
       return res.status(400).send(error);
     }
     return res.status(200).send({user, games, words, votes});
   },
+
+  async getReports(req, res){
+      const query = `SELECT id, "from", "to"
+      FROM users.reports;`
+      let rows = [];
+      try {
+        const response = await db.query(query);
+        rows = response.rows;
+      } catch (error) {
+          console.log(error.message)
+        return res.status(400).send(error);
+      }
+
+      for (let i = 0; i < rows.length; i++) {
+          rows[i].from = await getUser(rows[i].from);
+          rows[i].to = await getUser(rows[i].to);
+      }
+
+      return res.status(200).send(rows);
+  }
 };
+
+async function getUser(id){
+    const query = `SELECT id, username, email, password, role
+	FROM users."user" WHERE id=$1;`
+      let rows = [];
+      try {
+        const response = await db.query(query, [id]);
+        return response.rows[0]
+      } catch (error) {
+          console.log(error.message)
+      }
+}
 
 export default Admin;
