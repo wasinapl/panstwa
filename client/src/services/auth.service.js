@@ -10,8 +10,9 @@ class AuthService {
         password: user.password,
       })
       .then((response) => {
-        if (response.data.token) {
-          localStorage.setItem("user", JSON.stringify(response.data));
+        if (response.data.user.token) {
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+          localStorage.setItem("role", JSON.stringify(response.data.role));
         }
 
         return response.data;
@@ -25,16 +26,30 @@ class AuthService {
         name: user.name,
       })
       .then((response) => {
-        if (response.data.token) {
-          localStorage.setItem("user", JSON.stringify(response.data));
+        if (response.data.user.token) {
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+          localStorage.setItem("role", JSON.stringify(response.data.role));
         }
 
         return response.data;
       });
   }
 
+  auth(token) {
+    return axios
+      .get(API_URL + "auth", {headers: { 'x-access-token': token }})
+      .then((response) => {
+        if (response.data.user.token) {
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+          localStorage.setItem("role", JSON.stringify(response.data.role));
+        }
+        return response.data;
+      });
+  }
+
   logout() {
     localStorage.removeItem("user");
+    localStorage.removeItem("role");
   }
 
   register(user) {
@@ -45,8 +60,9 @@ class AuthService {
         password: user.password,
       })
       .then((response) => {
-        if (response.data.token) {
-          localStorage.setItem("user", JSON.stringify(response.data));
+        if (response.data.user.token) {
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+          localStorage.setItem("role", JSON.stringify(response.data.role));
         }
 
         return response.data;

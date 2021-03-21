@@ -168,7 +168,10 @@ export default {
         (this.loginMsg = ""), (this.isSending = true);
         this.$store.dispatch("auth/login", this.user).then(
           () => {
-            this.$router.push("/");
+            if(this.$route.query.nextUrl)
+            this.$router.push(this.$route.query.nextUrl);
+            else
+            this.$router.push('/');
           },
           (error) => {
             this.loginMsg = error.response.data.message;
@@ -182,7 +185,10 @@ export default {
         (this.registerMsg = ""), (this.isSending = true);
         this.$store.dispatch("auth/register", this.userRegister).then(
           () => {
-            this.$router.push("/");
+            if(this.$route.query.nextUrl)
+            this.$router.push(this.$route.query.nextUrl);
+            else
+            this.$router.push('/');
           },
           (error) => {
             this.registerMsg = error.response.data.message;
@@ -198,7 +204,10 @@ export default {
 
       this.$store.dispatch("auth/loginG", usr).then(
         () => {
-          this.$router.push(this.$route.query.nextUrl);
+          if(this.$route.query.nextUrl)
+            this.$router.push(this.$route.query.nextUrl);
+            else
+            this.$router.push('/');
         },
         (error) => {
           this.loginMsg = error.response.data.message;

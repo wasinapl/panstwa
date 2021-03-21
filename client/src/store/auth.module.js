@@ -11,9 +11,9 @@ export const auth = {
   actions: {
     login({ commit }, user) {
       return AuthService.login(user).then(
-        user => {
-          commit('loginSuccess', user);
-          return Promise.resolve(user);
+        (data)=> {
+          commit('loginSuccess', data);
+          return Promise.resolve(data.user);
         },
         error => {
           commit('loginFailure');
@@ -23,9 +23,21 @@ export const auth = {
     },
     loginG({ commit }, user) {
       return AuthService.loginG(user).then(
-        user => {
-          commit('loginSuccess', user);
-          return Promise.resolve(user);
+        (data) => {
+          commit('loginSuccess', data);
+          return Promise.resolve(data.user);
+        },
+        error => {
+          commit('loginFailure');
+          return Promise.reject(error);
+        }
+      );
+    },
+    auth({ commit }, token) {
+      return AuthService.auth(token).then(
+        (data) => {
+          commit('authSuccess', data);
+          return Promise.resolve(data.user);
         },
         error => {
           commit('loginFailure');
@@ -39,9 +51,9 @@ export const auth = {
     },
     register({ commit }, user) {
       return AuthService.register(user).then(
-        user => {
-          commit('registerSuccess', user);
-          return Promise.resolve(user);
+        (data) => {
+          commit('registerSuccess', data);
+          return Promise.resolve(data.user);
         },
         error => {
           commit('registerFailure');
@@ -51,21 +63,30 @@ export const auth = {
     }
   },
   mutations: {
-    loginSuccess(state, user) {
+    loginSuccess(state, data) {
       state.status.loggedIn = true;
-      state.user = user;
+      state.user = data.user;
+      state.role = data.role;
+    },
+    authSuccess(state, data) {
+      state.status.loggedIn = true;
+      state.user = data.user;
+      state.role = data.role;
     },
     loginFailure(state) {
       state.status.loggedIn = false;
       state.user = null;
+      state.role = null;
     },
     logout(state) {
       state.status.loggedIn = false;
       state.user = null;
+      state.role = null;
     },
-    registerSuccess(state, user) {
+    registerSuccess(state, data) {
       state.status.loggedIn = false;
-      state.user = user;
+      state.user = data.user;
+      state.role = data.role;
     },
     registerFailure(state) {
       state.status.loggedIn = false;

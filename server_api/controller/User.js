@@ -1,5 +1,6 @@
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
+import jwt from 'jsonwebtoken';
 import db from "../db";
 import Helper from "./Helper";
 
@@ -26,8 +27,8 @@ const User = {
     const hashPassword = Helper.hashPassword(req.body.password);
 
     const createQuery = `INSERT INTO
-    users."user"(id, email,username, password)
-      VALUES($1, $2, $3, $4)
+    users."user"(id, email,username, password, role)
+      VALUES($1, $2, $3, $4, 1)
       returning *`;
     const values = [uuidv4(), req.body.email, req.body.username, hashPassword];
     try {
@@ -52,12 +53,15 @@ const User = {
       } catch (error) {
         return res.status(400).send(error);
       }
-
-      return res.status(200).send({
+      let user = {
         token,
         username: rows[0].username,
         email: rows[0].email,
         uuid: rows[0].id,
+      };
+      return res.status(200).send({
+        user,
+        role: rows[0].role,
       });
     } catch (error) {
       if (error.routine === "_bt_check_unique") {
@@ -88,11 +92,15 @@ const User = {
         return res.status(400).send({ message: "Podano złe hasło" });
       }
       const token = Helper.generateToken(rows[0].id);
-      return res.status(200).send({
+      let user = {
         token,
         username: rows[0].username,
         email: rows[0].email,
         uuid: rows[0].id,
+      };
+      return res.status(200).send({
+        user,
+        role: rows[0].role,
       });
     } catch (error) {
       return res.status(400).send(error);
@@ -134,22 +142,30 @@ const User = {
             return res.status(400).send(error);
           }
 
-          return res.status(200).send({
+          let user = {
             token,
             username: rows[0].username,
             email: rows[0].email,
             uuid: rows[0].id,
+          };
+          return res.status(200).send({
+            user,
+            role: rows[0].role,
           });
         } catch (error) {
           return res.status(400).send(error);
         }
       }
       const token = Helper.generateToken(rows[0].id);
-      return res.status(200).send({
+      let user = {
         token,
         username: rows[0].username,
         email: rows[0].email,
         uuid: rows[0].id,
+      };
+      return res.status(200).send({
+        user,
+        role: rows[0].role,
       });
     } catch (error) {
       return res.status(400).send(error);
@@ -165,6 +181,33 @@ const User = {
       }
       return res.status(204).send({ message: "deleted" });
     } catch (error) {
+      return res.status(400).send(error);
+    }
+  },
+
+  async auth(req, res){
+    const token = req.headers['x-access-token'];
+    if(!token) {
+      return res.status(400).send({ 'message': 'Token is not provided' });
+    }
+    try {
+      const decoded = await jwt.verify(token, process.env.SECRET);
+      const text = 'SELECT * FROM users.user WHERE id = $1';
+      const { rows } = await db.query(text, [decoded.userId]);
+      if(!rows[0]) {
+        return res.status(400).send({ 'message': 'The token you provided is invalid' });
+      }
+      let user = {
+        token,
+        username: rows[0].username,
+        email: rows[0].email,
+        uuid: rows[0].id,
+      };
+      return res.status(200).send({
+        user,
+        role: rows[0].role,
+      });
+    } catch(error) {
       return res.status(400).send(error);
     }
   },

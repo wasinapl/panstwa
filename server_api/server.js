@@ -24,6 +24,8 @@ app.post('/api/user/register', User.create);
 app.post('/api/user/login', User.login);
 app.post('/api/user/loginG', User.loginG);
 app.get('/api/user/data', User.getData);
+app.get('/api/user/auth', User.auth);
+
 
 app.get('/api/categories', Categories.getAll);
 

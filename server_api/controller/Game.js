@@ -26,7 +26,7 @@ const Game = {
 
     for (let i = 0; i < players.length; i++) {
       const player = players[i];
-      await addPlayer(game_id, player.uuid);
+      await addPlayer(game_id, player.uuid, player.pkt);
     }
 
     for (let i = 0; i < rounds.length; i++) {
@@ -61,10 +61,10 @@ async function addCategory(game_id, cat_id) {
   }
 }
 
-async function addPlayer(game_id, player_id) {
-  let query = `INSERT INTO game.players(game_id, user_id) VALUES ($1, $2)`;
+async function addPlayer(game_id, player_id, pkt) {
+  let query = `INSERT INTO game.players(game_id, user_id, pkt) VALUES ($1, $2, $3)`;
   try {
-    let { rows } = await db.query(query, [game_id, player_id]);
+    let { rows } = await db.query(query, [game_id, player_id, pkt]);
   } catch (error) {
     console.log(error);
   }
