@@ -13,6 +13,7 @@ import authHeader from './services/auth-header';
 Vue.use(VueRouter);
 
 const SocketInstance = socketio('http://localhost:3000');
+//const SocketInstance = socketio('http://145.239.90.114:3000');
 
 SocketInstance.on("connect", () => {
   localStorage.setItem('socketid', SocketInstance.id)
@@ -36,6 +37,7 @@ Vue.config.productionTip = false;
 Vue.use(VueAxios, Axios);
 Vue.prototype.$header = authHeader;
 Vue.prototype.$api = 'http://localhost:3030/api';
+//Vue.prototype.$api = 'http://145.239.90.114:3030/api';
 
 new Vue({
   store,

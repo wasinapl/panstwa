@@ -10,16 +10,7 @@
         </v-card>
         <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
       </v-col>
-      <v-col cols="4">
-        <v-card color="#1F7087" dark v-if="!loading">
-          <v-card-title class="headline">
-            Średnia ilość pkt na gre:
-          </v-card-title>
-          <v-card-subtitle><h1>125</h1></v-card-subtitle>
-        </v-card>
-        <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
-      </v-col>
-      <v-col cols="4">
+      <v-col cols="5">
         <v-card color="#952175" dark v-if="!loading">
           <v-card-title class="headline">
             Średnia ilość pkt na runde:
@@ -33,7 +24,7 @@
           <v-card-title class="headline">
             Najlepsza kategoria:
           </v-card-title>
-          <v-card-subtitle><h1>Imie damskie</h1></v-card-subtitle>
+          <v-card-subtitle><h1>{{ data.category }}</h1></v-card-subtitle>
         </v-card>
         <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
       </v-col>
@@ -42,7 +33,7 @@
           <v-card-title class="headline">
             Najlepsza litera:
           </v-card-title>
-          <v-card-subtitle><h1>K</h1></v-card-subtitle>
+          <v-card-subtitle><h1>{{ data.letter }}</h1></v-card-subtitle>
         </v-card>
         <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
       </v-col>
@@ -67,6 +58,7 @@ export default {
       )
       .then((response) => {
         this.data = response.data;
+        console.log(response.data)
         this.loading = false;
       })
       .catch((error) => {
