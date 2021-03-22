@@ -37,7 +37,6 @@ const Statistics = {
         rounds++;
         round.words.forEach((word) => {
           letters[round.letter] += Number(word.points);
-          console.log(game.categories)
           let cat_name = game.categories.find(
             (cat) => cat.id == word.category_id
           ).name;
