@@ -60,6 +60,9 @@ io.on("connection", (socket) => {
   socket.on("timeChange", time => {
     rooms[socket.room].timeChange(socket, time);
   });
+  socket.on("styleChange", style => {
+    rooms[socket.room].styleChange(socket, style);
+  });
   socket.on("playerRdy", () => {
     rooms[socket.room].playerRdy(socket);
   });

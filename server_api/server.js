@@ -45,11 +45,16 @@ app.post('/api/user/report', User.report);
 app.post('/api/user/password', User.password);
 app.post('/api/user/rate', User.rate);
 
+app.post('/api/game/message', Game.saveMessage);
+
 app.use(Auth.adminAuth);
 
 app.post('/api/admin/searchuser', Admin.search)
 app.post('/api/admin/userinfo', Admin.getInfo)
 app.get('/api/admin/getreports', Admin.getReports)
+app.post('/api/admin/update', Admin.update)
+app.post('/api/admin/ban', Admin.ban)
+app.post('/api/admin/unban', Admin.unban)
 
 app.listen(3030);
 

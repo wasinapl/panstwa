@@ -15,7 +15,7 @@ const Game = {
       let { rows } = await db.query(query, [name, admin, options.rounds]);
       game_id = rows[0].id;
     } catch (error) {
-        console.log(error)
+      console.log(error);
       return res.status(400).send(error);
     }
 
@@ -50,6 +50,20 @@ const Game = {
     }
     return res.status(200).send();
   },
+
+  async saveMessage(req, res) {
+    const message = req.body.message;
+
+    const query = `INSERT INTO game.chat(
+      message, user_id)
+      VALUES ($1, $2);`;
+    try {
+      let { rows } = await db.query(query, [message, req.user.id]);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send(error);
+    }
+  },
 };
 
 async function addCategory(game_id, cat_id) {
@@ -74,7 +88,7 @@ async function addRound(game_id, letter) {
   let query = `INSERT INTO game.rounds(game_id, letter) VALUES ($1, $2) returning *`;
   try {
     let { rows } = await db.query(query, [game_id, letter]);
-    return rows[0].id
+    return rows[0].id;
   } catch (error) {
     console.log(error);
   }
@@ -88,7 +102,7 @@ async function addWord(word_id, round_id, points, category_id, uuid) {
       round_id,
       points,
       category_id,
-      uuid
+      uuid,
     ]);
   } catch (error) {
     console.log(error);

@@ -76,35 +76,54 @@
         Czas:
       </v-col>
       <v-col cols="2" align="start" justify="center">
-        <v-select :disabled="!admin" v-model="options.time" :items="times" solo dense></v-select>
+        <v-select
+          :disabled="!admin"
+          v-model="options.time"
+          :items="times"
+          solo
+          dense
+        ></v-select>
+      </v-col>
+      <v-col cols="2">
+      </v-col>
+      <v-col cols="1">
+         <v-btn
+          class="ma-2"
+          icon
+          color="green"
+          :disabled="!admin"
+          @click="styleChange('-')"
+        >
+          <v-icon large>mdi-arrow-left</v-icon>
+        </v-btn>
+      </v-col>
+      <v-col cols="2" align="start" justify="center">
+        <div :class="[options.style, 'style-div']"></div>
+      </v-col>
+      <v-col cols="1">
+         <v-btn
+          class="ma-2"
+          icon
+          color="green"
+          :disabled="!admin"
+          @click="styleChange('+')"
+        >
+          <v-icon large>mdi-arrow-right</v-icon>
+        </v-btn>
       </v-col>
     </v-row>
     <v-row>
-      <v-combobox
+      <v-select
         v-model="options.categories"
         :items="items"
         item-text="name"
-        item-value="id"
-        :search-input.sync="search"
-        hide-selected
-        hint="Maksimum 5 kategorii"
-        label="Wybierz kategorie"
+        return-object
+        :menu-props="{ maxHeight: '400' }"
+        label="Kategorie"
         multiple
         persistent-hint
-        small-chips
         :disabled="!admin"
-      >
-        <template v-slot:no-data>
-          <v-list-item>
-            <v-list-item-content>
-              <v-list-item-title>
-                Nie ma pasujących kategorii "<strong>{{ search }}</strong
-                >". Wciśnij <kbd>enter</kbd> adby dodać
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </template>
-      </v-combobox>
+      ></v-select>
     </v-row>
   </v-container>
 </template>
@@ -119,6 +138,7 @@ export default {
       roomId: "",
       link: "",
       times: [],
+      styles: ['color-1', 'color-2', 'color-3', 'color-4'],
     };
   },
   sockets: {
@@ -134,12 +154,28 @@ export default {
     timeChange(time) {
       this.options.time = time;
     },
+    styleChange(style) {
+      this.options.style = style;
+    },
   },
   methods: {
     roundChange(val) {
       if (val === "+") this.options.rounds++;
       else if (val === "-") {
         if (--this.options.rounds < 1) this.options.rounds = 1;
+      }
+    },
+    styleChange(val) {
+      let index = this.styles.findIndex(el => el == this.options.style);
+      if (val === "+") {
+        index++;
+        if(this.styles[index]) this.options.style = this.styles[index];
+        else this.options.style = this.styles[0];
+      }
+      else if (val === "-") {
+        index--;
+        if(this.styles[index]) this.options.style = this.styles[index];
+        else this.options.style = this.styles[this.styles.length - 1];
       }
     },
     playersChange(val) {
@@ -175,7 +211,7 @@ export default {
   watch: {
     "options.categories"(val) {
       this.search = "";
-      if (val.length > 5) {
+      if (val.length > 7) {
         this.$nextTick(() => this.options.categories.pop());
       }
     },
@@ -186,4 +222,12 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.style-div{
+  height: 38px;
+  width: 100px;
+  border-radius: 5px;
+  margin-top: 5px;
+  margin-left: 10px;
+}
+</style>

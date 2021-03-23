@@ -104,7 +104,6 @@ export default {
     items: [
       { text: "Użytkownicy", icon: "mdi-account-multiple", link: { name:"users"} },
       { text: "Zgłoszenia", icon: "mdi-alert", link: { name:"reports"} },
-      { text: "Kategorie", icon: "mdi-timeline", link: "lines" },
     ],
   }),
   methods: {

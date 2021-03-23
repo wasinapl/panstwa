@@ -2,14 +2,22 @@
   <v-container>
     <h2>Zgłoszenia</h2>
     <v-row style="margin-top: 50px;">
-      <v-col cols="4" class="table">
+      <v-col cols="5">
         <v-row>
           <v-col class="el-names">Od</v-col>
           <v-col class="el-names">Dla</v-col>
         </v-row>
-        <v-row v-for="(report, i) in reports" :key="i">
-          <v-col class="el" @click="go(report.from.id)">{{ report.from.email }}</v-col>
-          <v-col class="el" @click="go(report.to.id)">{{ report.to.email }}</v-col>
+        <v-row>
+          <v-col class="table">
+            <v-row v-for="(report, i) in reports" :key="i">
+              <v-col class="el" @click="go(report.from.id)">{{
+                report.from.email
+              }}</v-col>
+              <v-col class="el" @click="go(report.to.id)">{{
+                report.to.email
+              }}</v-col>
+            </v-row>
+          </v-col>
         </v-row>
       </v-col>
     </v-row>
@@ -24,10 +32,10 @@ export default {
     };
   },
   methods: {
-      go(id){
-          console.log(id)
-          this.$router.push({ name: 'user', params: { id } })
-      }
+    go(id) {
+      console.log(id);
+      this.$router.push({ name: "user", params: { id } });
+    },
   },
   async mounted() {
     try {
@@ -52,12 +60,9 @@ export default {
   border: 2px solid #000;
 }
 .el {
-  border-left: 1px solid #000;
-  border-right: 1px solid #000;
-  border-bottom: 1px solid #000;
   cursor: pointer;
 }
 .el:hover {
- background-color: gray;
+  background-color: gray;
 }
 </style>

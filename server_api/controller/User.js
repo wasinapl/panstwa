@@ -42,15 +42,17 @@ const User = {
         let values = [rows[0].id];
         await db.query(query, values);
       } catch (error) {
+        console.log(error)
         return res.status(400).send(error);
       }
 
       try {
-        let query = `INSERT INTO users.votes(
-          id_user, vote_up, vote_down)
+        let query = `INSERT INTO users.votes_count(
+          user_id, vote_up, vote_down)
           VALUES ($1, 0, 0)`;
         await db.query(query, [rows[0].id]);
       } catch (error) {
+        console.log(error)
         return res.status(400).send(error);
       }
       let user = {
@@ -69,6 +71,7 @@ const User = {
           .status(400)
           .send({ message: "User with that EMAIL already exist" });
       }
+      console.log(error)
       return res.status(400).send(error);
     }
   },
@@ -88,6 +91,9 @@ const User = {
       if (!rows[0]) {
         return res.status(400).send({ message: "Podany email nie istnieje" });
       }
+      if(await banCheck(rows[0].id)){
+        return res.status(400).send({ message: "Konto zbanowane." });
+      }
       if (!Helper.comparePassword(rows[0].password, req.body.password)) {
         return res.status(400).send({ message: "Podano złe hasło" });
       }
@@ -103,6 +109,7 @@ const User = {
         role: rows[0].role,
       });
     } catch (error) {
+      console.log(error)
       return res.status(400).send(error);
     }
   },
@@ -134,8 +141,8 @@ const User = {
           }
 
           try {
-            let query = `INSERT INTO users.votes(
-              id_user, vote_up, vote_down)
+            let query = `INSERT INTO users.votes_count(
+              user_id, vote_up, vote_down)
               VALUES ($1, 0, 0)`;
             await db.query(query, [rows[0].id]);
           } catch (error) {
@@ -155,6 +162,9 @@ const User = {
         } catch (error) {
           return res.status(400).send(error);
         }
+      }
+      if(await banCheck(rows[0].id)){
+        return res.status(400).send({ message: "Konto zbanowane." });
       }
       const token = Helper.generateToken(rows[0].id);
       let user = {
@@ -398,6 +408,19 @@ async function passCheck(id, pass) {
   } catch (err) {
     return false;
   }
+}
+
+async function banCheck(id) {
+  const query = `SELECT id, user_id
+    FROM users.bans WHERE user_id = $1;`;
+  try {
+    const { rows } = await db.query(query, [id]);
+    if (rows[0]) return true;
+  } catch (error) {
+    console.log(error.message);
+    return res.status(400).send(error);
+  }
+  return false;
 }
 
 export default User;

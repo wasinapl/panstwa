@@ -2,7 +2,11 @@ import VueRouter from "vue-router";
 import Start from "./views/app/Start";
 import Room from "./views/app/Room";
 import Login from "./views/auth/Login";
+
 import Admin from "./views/app/Admin";
+import Users from "./components/Admin/Users";
+import User from "./components/Admin/User";
+import Reports from "./components/Admin/Reports";
 
 const routes = [
   { path: "/", component: Start },
@@ -19,17 +23,17 @@ const routes = [
       {
         name: "users",
         path: "users",
-        component: () => import("./components/Admin/Users"),
+        component: Users,
       },
       {
         name: "user",
         path: "user/:id",
-        component: () => import("./components/Admin/User"),
+        component: User,
       },
       {
         name: "reports",
         path: "reports",
-        component: () => import("./components/Admin/Reports"),
+        component: Reports,
       },
     ],
   },

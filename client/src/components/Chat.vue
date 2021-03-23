@@ -64,8 +64,19 @@ export default {
         msg: this.msg,
       });
       this.$socket.emit("msg", this.msg);
+      const headers = this.$header();
+      this.axios.post(
+        this.$api + "/game/message",
+        {
+          message: this.msg,
+        },
+        {
+          headers,
+        }
+      );
       this.msg = null;
       setTimeout(this.scroll, 50);
+      
     },
     scroll() {
       var container = this.$el.querySelector("#msgContainer");

@@ -17,9 +17,7 @@
           </v-row>
           <v-row>
             <v-col cols="1">
-              <v-checkbox
-                v-model="ifPass"
-              ></v-checkbox>
+              <v-checkbox v-model="ifPass"></v-checkbox>
             </v-col>
             <v-col cols="9">
               <v-text-field
@@ -27,6 +25,7 @@
                 type="password"
                 :required="ifPass"
                 :disabled="!ifPass"
+                :rules="[rules.required, rules.counter]"
                 v-model="pass"
               ></v-text-field>
             </v-col>
@@ -52,6 +51,10 @@ export default {
     name: "",
     pass: "",
     ifPass: true,
+    rules: {
+      required: (value) => !!value || "Wymagane.",
+      counter: (value) => value.length >= 3 || "Min 3 znaki",
+    },
   }),
   dialog(val) {
     if (!val) {
@@ -64,10 +67,9 @@ export default {
       this.dialog = false;
     },
     create() {
-      if(this.ifPass)
-      this.$socket.emit("newGame", {name: this.name, pass: this.pass});
-      else
-      this.$socket.emit("newGame", {name: this.name});
+      if (this.ifPass && this.pass.length > 0)
+        this.$socket.emit("newGame", { name: this.name, pass: this.pass });
+      else if(!this.ifPass) this.$socket.emit("newGame", { name: this.name });
     },
   },
 };
