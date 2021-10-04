@@ -1,1 +1,1 @@
-Panstwa miasta elo
+Panstwa miasta
